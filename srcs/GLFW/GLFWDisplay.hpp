@@ -15,7 +15,7 @@ class GLFWDisplay : public IDisplay {
   virtual ~GLFWDisplay(void);
 
   bool windowIsOpen(void) const;
-  void renderScene(void) const;
+  void renderScene(void);
 
  private:
   int _width, _height;

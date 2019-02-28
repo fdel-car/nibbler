@@ -10,9 +10,8 @@ GLFWDisplay::GLFWDisplay(void) {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
   glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
-  // glfwWindowHint(GLFW_SAMPLES, 4);
-  _window =
-      glfwCreateWindow(WIDTH, HEIGHT, "Particle system", nullptr, nullptr);
+  glfwWindowHint(GLFW_SAMPLES, 4);
+  _window = glfwCreateWindow(WIDTH, HEIGHT, "Nibbler - GLFW", nullptr, nullptr);
   if (!_window) {
     glfwTerminate();
     throw std::runtime_error("Failed to create windows GLFW");
@@ -25,7 +24,6 @@ GLFWDisplay::GLFWDisplay(void) {
 
   glfwGetFramebufferSize(_window, &_width, &_height);
   glfwMakeContextCurrent(_window);
-  // glfwSwapInterval(0);  // Remove 60 fps limit from glfw
 
   // glfwSetKeyCallback(_window, _keyCallback);
   // glfwSetCursorPosCallback(_window, _cursorCallback);
@@ -60,7 +58,7 @@ bool GLFWDisplay::windowIsOpen(void) const {
   return !glfwWindowShouldClose(_window);
 }
 
-void GLFWDisplay::renderScene(void) const {
+void GLFWDisplay::renderScene(void) {
   glfwPollEvents();
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
