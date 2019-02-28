@@ -7,7 +7,7 @@ if [ $? == 1 ]; then
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python get-pip.py --user
     rm get-pip.py
-	echo -e "\033[0;31mIn order to finish the install script you need to add the path to the pip binary to your PATH env variable.\033[0m"
+	echo -e "\033[1;31mIn order to finish the install script you need to add the path to the pip binary to your PATH env variable.\033[0m"
     exit 0;
 fi
 
@@ -22,4 +22,11 @@ if [[ ! -d "./libs/srcs/glad" && ! -d "./libs/includes/glad" && ! -d "./libs/inc
     mkdir -p ./libs/includes/KHR
     mv tmp-glad/include/KHR/khrplatform.h ./libs/includes/KHR
     rm -rf tmp-glad
+fi
+
+LD_LIBRARY_PATH=`pkg-config --libs-only-L sfml-graphics | cut -c 3-`
+cat ~/.zshrc | grep $LD_LIBRARY_PATH >> /dev/null
+if [ $? == 1 ]; then
+    echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> ~/.zshrc
+    echo -e "\033[1;33mYou need to source your ~/.zshrc to run nibbler with the SFML."
 fi
