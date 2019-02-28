@@ -1,0 +1,11 @@
+# Libs
+libs/
+dylibs/
+
+# Binaries
+objs/
+nibbler
+.DS_Store
+
+# Settings
+.vscode/
