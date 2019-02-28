@@ -60,7 +60,7 @@ bool GLFWDisplay::windowIsOpen(void) const {
   return !glfwWindowShouldClose(_window);
 }
 
-void GLFWDisplay::renderScene(void) const {
+void GLFWDisplay::renderScene(void) {
   glfwPollEvents();
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);

@@ -38,6 +38,8 @@ $(DYLIBS_DIR):
 	@$(CC) $(CFLAGS) -c $(GLFW_DIR)/GLFWDisplay.cpp -o $(OBJS_DIR)/GLFW/GLFWDisplay.o $(HEADERS) `pkg-config --cflags glfw3`
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/GLFW/GLFWDisplay.o $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
 	@# SFML dylib
+	$(CC) $(CFLAGS) -c $(SFML_DIR)/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 	@# SDL dylib
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
@@ -45,6 +47,7 @@ $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(OBJS_DIR)/glad
 	@mkdir -p $(OBJS_DIR)/GLFW
+	@mkdir -p $(OBJS_DIR)/SFML
 
 $(TARGET): $(OBJS)
 	@$(CC) $(CFLAGS) -o $@ $^ # $(LIBS)
