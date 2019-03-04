@@ -1,7 +1,8 @@
 #include "SFML/SFMLDisplay.hpp"
 
 SFMLDisplay::SFMLDisplay(void)
-    : _window(sf::VideoMode(800, 600), "Nibbler - SFML", sf::Style::Close) {
+    : _window(sf::VideoMode(WIDTH, HEIGHT), "Nibbler - SFML",
+              sf::Style::Close) {
   std::cout << "SFML created :)" << std::endl;
 }
 

@@ -2,12 +2,17 @@
 
 #include <fstream>
 #include <sstream>
-#include "GLFW/GLFWDisplay.hpp"
+#include "IDisplay.hpp"
+
+// GLFW loader
+#include <glad/glad.h>
+// Important, the formatter is dumb
+#include <GLFW/glfw3.h>
 
 class ShaderProgram final {
  public:
   ShaderProgram(std::string const &vsPath, std::string const &fsPath);
-  virtual ~ShaderProgram(void);
+  ~ShaderProgram(void);
 
   GLuint getID(void) const;
   void setBool(std::string const &name, bool value) const;
