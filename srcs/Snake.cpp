@@ -24,8 +24,13 @@ void Snake::runLoop(void) {
     throw std::runtime_error(
         "The graphical interface was not initialzed correctly.");
   while (_display->windowIsOpen()) {
-    _display->renderScene();
+    _display->renderScene(&_snakeBodyCoords);
+	_checkInputPressed(&_inputsPressed);
   }
+}
+
+void Snake::_checkInputPressed(void) {
+
 }
 
 void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }

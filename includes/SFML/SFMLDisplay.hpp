@@ -5,6 +5,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <glm/glm.hpp>
+
 #include "IDisplay.hpp"
 
 class SFMLDisplay : public IDisplay {
@@ -13,7 +15,8 @@ class SFMLDisplay : public IDisplay {
   virtual ~SFMLDisplay(void);
 
   bool windowIsOpen(void) const;
-  void renderScene(void);
+  void renderScene(std::vector<glm::vec2> *snakeBodyCoords);
+  void setEvents(std::unordered_map<int, bool> *inputsPressed);
 
  private:
   int _width, _height;
@@ -23,6 +26,9 @@ class SFMLDisplay : public IDisplay {
   SFMLDisplay(SFMLDisplay const &src);
 
   SFMLDisplay &operator=(SFMLDisplay const &rhs);
+
+  void _setKeyPressed(std::unordered_map<int, bool> *inputsPressed, bool isPressed);
+
 };
 
 extern "C" {
