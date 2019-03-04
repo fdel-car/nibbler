@@ -1,4 +1,5 @@
-#include "GLFWDisplay.hpp"
+#include "GLFW/GLFWDisplay.hpp"
+#include "GLFW/ShaderProgram.hpp"
 
 GLFWDisplay::GLFWDisplay(void) {
   if (!glfwInit()) throw std::runtime_error("Failed to initialize GLFW");
@@ -33,12 +34,15 @@ GLFWDisplay::GLFWDisplay(void) {
   printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
   glViewport(0, 0, _width, _height);
 
-  std::cout << "Created :)" << std::endl;
+  // _shaderProgram = new ShaderProgram();
+
+  std::cout << "GLFW created :)" << std::endl;
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
-  std::cout << "Destroyed :(" << std::endl;
+  if (_shaderProgram) delete _shaderProgram;
   glfwTerminate();
+  std::cout << "GLFW destroyed :(" << std::endl;
 }
 
 // https://vallentin.io/2014/02/07/glfw-center-window

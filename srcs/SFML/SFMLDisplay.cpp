@@ -1,11 +1,13 @@
-#include "SFMLDisplay.hpp"
+#include "SFML/SFMLDisplay.hpp"
 
 SFMLDisplay::SFMLDisplay(void)
     : _window(sf::VideoMode(800, 600), "Nibbler - SFML", sf::Style::Close) {
-  std::cout << "Created :)" << std::endl;
+  std::cout << "SFML created :)" << std::endl;
 }
 
-SFMLDisplay::~SFMLDisplay(void) { std::cout << "Destroyed :(" << std::endl; }
+SFMLDisplay::~SFMLDisplay(void) {
+  std::cout << "SFML destroyed :(" << std::endl;
+}
 
 bool SFMLDisplay::windowIsOpen(void) const { return _window.isOpen(); }
 
