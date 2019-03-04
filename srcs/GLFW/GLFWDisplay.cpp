@@ -96,6 +96,7 @@ void GLFWDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
   // }
 
   glfwSwapBuffers(_window);
+  (void)sndCoords;
 }
 
 std::vector<std::string> GLFWDisplay::_keyPressed = std::vector<std::string>();
