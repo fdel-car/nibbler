@@ -1,7 +1,38 @@
 #include "GLFW/GLFWDisplay.hpp"
-#include "GLFW/ShaderProgram.hpp"
 
 GLFWDisplay::GLFWDisplay(void) {
+  _initContext();
+  _shaderProgram = new ShaderProgram("./srcs/GLFW/shaders/default.vs",
+                                     "./srcs/GLFW/shaders/default.fs");
+
+  std::vector<float> vertices = {0.5f, -0.5f, 0.0f, 0.5f, 0.5f,
+                                 0.0f, -0.5f, 0.5f, 0.0f};
+
+  // GLuint VBO, VAO;
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices.front(),
+               GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  std::cout << "GLFW created :)" << std::endl;
+}
+
+GLFWDisplay::~GLFWDisplay(void) {
+  if (_shaderProgram) delete _shaderProgram;
+  glfwTerminate();
+  std::cout << "GLFW destroyed :(" << std::endl;
+}
+
+void GLFWDisplay::_initContext(void) {
   if (!glfwInit()) throw std::runtime_error("Failed to initialize GLFW");
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -33,16 +64,6 @@ GLFWDisplay::GLFWDisplay(void) {
     throw std::runtime_error("Failed to initialize GLAD");
   printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
   glViewport(0, 0, _width, _height);
-
-  // _shaderProgram = new ShaderProgram();
-
-  std::cout << "GLFW created :)" << std::endl;
-}
-
-GLFWDisplay::~GLFWDisplay(void) {
-  if (_shaderProgram) delete _shaderProgram;
-  glfwTerminate();
-  std::cout << "GLFW destroyed :(" << std::endl;
 }
 
 // https://vallentin.io/2014/02/07/glfw-center-window
@@ -62,11 +83,23 @@ bool GLFWDisplay::windowIsOpen(void) const {
   return !glfwWindowShouldClose(_window);
 }
 
-void GLFWDisplay::renderScene(void) {
+void GLFWDisplay::renderScene(std::vector<glm::vec2> *snakeCoords1, std::vector<glm::vec2> *snakeCoords2) {
+  (void)snakeCoords1;
+  (void)snakeCoords2;
   glfwPollEvents();
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  glUseProgram(_shaderProgram->getID());
+  glBindVertexArray(VAO);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+
   glfwSwapBuffers(_window);
+}
+
+void GLFWDisplay::setEvents(std::unordered_map<int, bool> *inputsPressed) {
+	(void)inputsPressed;
+
 }
 
 GLFWDisplay *createDisplay(void) { return new GLFWDisplay(); }

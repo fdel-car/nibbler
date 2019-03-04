@@ -1,4 +1,4 @@
-#include "ShaderProgram.hpp"
+#include "GLFW/ShaderProgram.hpp"
 
 ShaderProgram::ShaderProgram(std::string const& vsPath,
                              std::string const& fsPath) {

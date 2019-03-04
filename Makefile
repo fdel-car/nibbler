@@ -8,7 +8,7 @@ CFLAGS := -Wall -Wextra -Werror -std=c++11
 DYLIBS_FLAGS := -shared -fPIC
 ignore-warnings : CFLAGS := -w
 # LIBS :=
-HEADERS := -I./includes/ -I./libs/includes/
+HEADERS := -I./includes/ -I./libs/includes/ `pkg-config --cflags glm`
 
 # Colors
 RESET := \033[0m
@@ -23,25 +23,26 @@ MOVE_CURSOR_UP := \033[1A
 SRCS := $(shell find $(SRCS_DIR) -maxdepth 1 -name "*.cpp")
 OBJS := $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
 
-GLFW_DIR := ./srcs/GLFW
-SFML_DIR := ./srcs/SFML
-SDL_DIR := ./srcs/SDL
+GLFW_SRCS := $(shell find $(SRCS_DIR)/GLFW -maxdepth 1 -name "*.cpp")
+GLFW_OBJS := $(patsubst $(SRCS_DIR)/GLFW/%.cpp,$(OBJS_DIR)/GLFW/%.o,$(GLFW_SRCS))
 
 all: $(OBJS_DIR) $(DYLIBS_DIR) $(TARGET)
 
 ignore-warnings: all
 
-$(DYLIBS_DIR):
+$(DYLIBS_DIR): $(GLFW_OBJS)
 	@mkdir -p $(DYLIBS_DIR)
 	@# GLFW dylib
 	@$(CC) $(CFLAGS) -c ./libs/srcs/glad/glad.cpp -o $(OBJS_DIR)/glad/glad.o $(HEADERS)
-	@$(CC) $(CFLAGS) -c $(GLFW_DIR)/GLFWDisplay.cpp -o $(OBJS_DIR)/GLFW/GLFWDisplay.o $(HEADERS) `pkg-config --cflags glfw3` `pkg-config --cflags glm`
-	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/GLFW/GLFWDisplay.o $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3` `pkg-config --libs glm`
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(GLFW_OBJS) $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
 	@# SFML dylib
-	@$(CC) $(CFLAGS) -c $(SFML_DIR)/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+	@$(CC) $(CFLAGS) -c $(SRCS_DIR)/SFML/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 	@# SDL dylib
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
+
+$(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags glfw3`
 
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)

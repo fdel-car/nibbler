@@ -1,21 +1,7 @@
 #pragma once
 
-#include <glad/glad.h>
-// Important, the formatter is dumb
-#include <GLFW/glfw3.h>
-
-// GLM (math library)
-#include <glm/glm.hpp>
-#include <glm/gtc/epsilon.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#define WIDTH 1280
-#define HEIGHT 720
-
-#include "IDisplay.hpp"
-
-class ShaderProgram;
+#include <vector>
+#include "GLFW/ShaderProgram.hpp"
 
 class GLFWDisplay : public IDisplay {
  public:
@@ -23,15 +9,18 @@ class GLFWDisplay : public IDisplay {
   virtual ~GLFWDisplay(void);
 
   bool windowIsOpen(void) const;
-  void renderScene(void);
+  void renderScene(std::vector<glm::vec2> *snakeCoords1, std::vector<glm::vec2> *snakeCoords2);
+  void setEvents(std::unordered_map<int, bool> *inputsPressed);
 
  private:
   int _width, _height;
+  GLuint VAO, VBO;
   GLFWwindow *_window = nullptr;
   ShaderProgram *_shaderProgram = nullptr;
 
   GLFWDisplay(GLFWDisplay const &src);
 
+  void _initContext(void);
   void _centerWindow(GLFWmonitor *monitor);
 
   GLFWDisplay &operator=(GLFWDisplay const &rhs);
