@@ -6,7 +6,7 @@
 
 class Circle {
  public:
-  Circle(void);
+  Circle(glm::vec2 const &pos);
 
   virtual ~Circle(void);
 
@@ -16,7 +16,9 @@ class Circle {
   GLuint _VAO, _VBO;
   std::vector<glm::vec3> _vertices;
 
-  static const float _size;
+  static const float _radius;
+
+  Circle(void);
 
   Circle(Circle const &src);
 

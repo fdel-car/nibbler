@@ -3,7 +3,7 @@
 int main(int ac, char **av) {
   srand(time(nullptr));
   try {
-    // TODO: map size parsing and stuff
+    // TODO: Map size parsing and stuff
     (void)ac;
     (void)av;
     Snake game;

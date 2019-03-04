@@ -12,7 +12,8 @@ class GLFWDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(void);
+  void renderScene(std::vector<glm::vec2> const &fstCoords,
+                   std::vector<glm::vec2> const &sndCoords);
 
  private:
   int _width, _height;

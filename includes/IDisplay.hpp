@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
 // GLM (math library)
 #include <glm/glm.hpp>
@@ -21,6 +22,9 @@ class IDisplay {
  public:
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
-  virtual void renderScene(void) = 0;
+  virtual void renderScene(std::vector<glm::vec2> const &fstCoords,
+                           std::vector<glm::vec2> const &sndCoords) = 0;
+  // virtual void setEvents(std::unordered_map<int, bool> *inputsPressed) = 0;
+
   virtual ~IDisplay(){};
 };

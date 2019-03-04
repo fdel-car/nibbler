@@ -79,12 +79,21 @@ void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   _keyReleased.clear();
 }
 
-void GLFWDisplay::renderScene(void) {
+void GLFWDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
+                              std::vector<glm::vec2> const &sndCoords) {
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Circle bodyPart;
-  bodyPart.render(*_shaderProgram);
+  // TODO: Avoid that reinitialization every frame
+  for (auto coords : fstCoords) {
+    Circle bodyPart(coords);
+    bodyPart.render(*_shaderProgram);
+  }
+
+  // for (auto coords : sndCoords) {
+  //   Circle bodyPart(coords);
+  //   bodyPart.render(*_shaderProgram);
+  // }
 
   glfwSwapBuffers(_window);
 }
@@ -95,14 +104,14 @@ std::vector<std::string> GLFWDisplay::_keyReleased = std::vector<std::string>();
 
 void GLFWDisplay::_keyCallback(GLFWwindow *window, int key, int scancode,
                                int action, int mods) {
-  // TODO: Check if key is in the _keyMap
-  // ushort key = _keyMap[key];
+  auto it = _keyMap.find(key);
+  if (it == _keyMap.end()) return;
 
   if (action == GLFW_PRESS)
-    _keyPressed.push_back(_keyMap[key]);
-  else if (action == GLFW_RELEASE) {
-    _keyReleased.push_back(_keyMap[key]);
-  }
+    _keyPressed.push_back(it->second);
+  else if (action == GLFW_RELEASE)
+    _keyReleased.push_back(it->second);
+
   (void)scancode;
   (void)window;
   (void)mods;
