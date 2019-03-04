@@ -17,6 +17,7 @@ class Snake {
   IDisplay *(*_displayCreator)(void);
   void (*_displayDestructor)(IDisplay *);
   IDisplay *_display = nullptr;
+  std::map<std::string, KeyState> _keyMap;
 
   static std::vector<std::string> _dylibsPaths;
 

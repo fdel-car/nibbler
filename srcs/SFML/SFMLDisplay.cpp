@@ -12,12 +12,19 @@ SFMLDisplay::~SFMLDisplay(void) {
 
 bool SFMLDisplay::windowIsOpen(void) const { return _window.isOpen(); }
 
-void SFMLDisplay::renderScene(void) {
+void SFMLDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   while (_window.pollEvent(_event)) {
     if (_event.type == sf::Event::Closed) {
       _window.close();
     }
+    if (_event.type == sf::Event::KeyPressed) {
+      std::cout << _event.key.code << std::endl;
+    }
   }
+  (void)keyMap;
+}
+
+void SFMLDisplay::renderScene(void) {
   _window.clear(sf::Color::Black);
   _window.display();
 }

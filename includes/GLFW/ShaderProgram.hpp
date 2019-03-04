@@ -2,12 +2,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "IDisplay.hpp"
-
-// GLFW loader
-#include <glad/glad.h>
-// Important, the formatter is dumb
-#include <GLFW/glfw3.h>
+#include "GLFW/Headers.hpp"
 
 class ShaderProgram final {
  public:

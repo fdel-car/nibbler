@@ -1,35 +1,23 @@
 #include "GLFW/GLFWDisplay.hpp"
+#include "GLFW/Circle.hpp"
 
 GLFWDisplay::GLFWDisplay(void) {
   _initContext();
   _shaderProgram = new ShaderProgram("./srcs/GLFW/shaders/default.vs",
                                      "./srcs/GLFW/shaders/default.fs");
 
-  std::vector<float> vertices = {0.5f, -0.5f, 0.0f, 0.5f, 0.5f,
-                                 0.0f, -0.5f, 0.5f, 0.0f};
+  glm::mat4 projectionMatrix =
+      glm::ortho<float>(0, WIDTH, HEIGHT, 0, 0.1f, 100);
+  glm::mat4 viewMatrix =
+      glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -10.f));
 
-  // GLuint VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices.front(),
-               GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  std::cout << "GLFW created :)" << std::endl;
+  glUseProgram(_shaderProgram->getID());
+  _shaderProgram->setMat4("VP", projectionMatrix * viewMatrix);
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
   if (_shaderProgram) delete _shaderProgram;
   glfwTerminate();
-  std::cout << "GLFW destroyed :(" << std::endl;
 }
 
 void GLFWDisplay::_initContext(void) {
@@ -57,7 +45,7 @@ void GLFWDisplay::_initContext(void) {
   glfwGetFramebufferSize(_window, &_width, &_height);
   glfwMakeContextCurrent(_window);
 
-  // glfwSetKeyCallback(_window, _keyCallback);
+  glfwSetKeyCallback(_window, _keyCallback);
   // glfwSetCursorPosCallback(_window, _cursorCallback);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -83,17 +71,55 @@ bool GLFWDisplay::windowIsOpen(void) const {
   return !glfwWindowShouldClose(_window);
 }
 
-void GLFWDisplay::renderScene(void) {
+void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   glfwPollEvents();
-  glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+  for (auto key : _keyPressed) keyMap[key].currFrame = true;
+  for (auto key : _keyReleased) keyMap[key].currFrame = false;
+  _keyPressed.clear();
+  _keyReleased.clear();
+}
+
+void GLFWDisplay::renderScene(void) {
+  glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glUseProgram(_shaderProgram->getID());
-  glBindVertexArray(VAO);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  Circle bodyPart;
+  bodyPart.render(*_shaderProgram);
 
   glfwSwapBuffers(_window);
 }
+
+std::vector<std::string> GLFWDisplay::_keyPressed = std::vector<std::string>();
+
+std::vector<std::string> GLFWDisplay::_keyReleased = std::vector<std::string>();
+
+void GLFWDisplay::_keyCallback(GLFWwindow *window, int key, int scancode,
+                               int action, int mods) {
+  // TODO: Check if key is in the _keyMap
+  // ushort key = _keyMap[key];
+
+  if (action == GLFW_PRESS)
+    _keyPressed.push_back(_keyMap[key]);
+  else if (action == GLFW_RELEASE) {
+    _keyReleased.push_back(_keyMap[key]);
+  }
+  (void)scancode;
+  (void)window;
+  (void)mods;
+}
+
+std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
+  std::map<ushort, std::string> keyMap;
+
+  keyMap[GLFW_KEY_W] = "W";
+  keyMap[GLFW_KEY_A] = "A";
+  keyMap[GLFW_KEY_S] = "S";
+  keyMap[GLFW_KEY_D] = "D";
+
+  return keyMap;
+}
+
+std::map<ushort, std::string> GLFWDisplay::_keyMap = _initKeyMap();
 
 GLFWDisplay *createDisplay(void) { return new GLFWDisplay(); }
 

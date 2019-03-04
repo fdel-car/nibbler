@@ -10,6 +10,7 @@ class SFMLDisplay : public IDisplay {
   virtual ~SFMLDisplay(void);
 
   bool windowIsOpen(void) const;
+  void pollEvent(std::map<std::string, KeyState> &keyMap);
   void renderScene(void);
 
  private:
