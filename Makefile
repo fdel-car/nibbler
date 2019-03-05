@@ -39,8 +39,8 @@ $(DYLIBS_DIR): $(GLFW_OBJS)
 	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SFML/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
 	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 	@# SDL dylib
-	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SDL/SDLDisplay.cpp -o $(OBJS_DIR)/SDL/SDLDisplay.o $(HEADERS) `pkg-config --cflags sdl2`
-	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SDL/SDLDisplay.o -o $(DYLIBS_DIR)/SDLDisplay.so `pkg-config --libs sdl2`
+	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SDL/SDLDisplay.cpp -o $(OBJS_DIR)/SDL/SDLDisplay.o $(HEADERS) -F/Library/Frameworks 
+	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SDL/SDLDisplay.o -o $(DYLIBS_DIR)/SDLDisplay.so -framework SDL2
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
 $(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp

@@ -162,9 +162,9 @@ void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
 std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
-  vector.push_back("./dylibs/GLFWDisplay.so");
+  // vector.push_back("./dylibs/GLFWDisplay.so");
   vector.push_back("./dylibs/SDLDisplay.so");
-  vector.push_back("./dylibs/SFMLDisplay.so");
+  // vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;
 }

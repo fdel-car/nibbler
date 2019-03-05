@@ -84,11 +84,11 @@ void SDLDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords) {
 void SDLDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
                              std::vector<glm::vec2> const &sndCoords) {
   SDL_RenderClear(_renderer);
-  // _drawSnake(fstCoords);
-  // if (sndCoords.size() != 0) _drawSnake(sndCoords);
-  SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
+  _drawSnake(fstCoords);
+  if (sndCoords.size() != 0) _drawSnake(sndCoords);
+  // SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
 
-  _drawCircle(200, 200, 10);
+  // _drawCircle(200, 200, 10);
   SDL_RenderPresent(_renderer);
   (void)fstCoords;
   (void)sndCoords;
