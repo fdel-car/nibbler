@@ -6,14 +6,6 @@ Snake::Snake(Config config)
       _interval(0.2f),
       _snakeUnit(30) {
   _newDylibIdx = _dylibIdx;
-
-  _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
-  if (!_handle) _dlerrorWrapper();
-
-  _displayCreator =
-      (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
-  if (!_displayCreator) _dlerrorWrapper();
-
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
@@ -30,19 +22,32 @@ Snake::Snake(Config config)
       sndPlayer.allDirs.push_back("UP");
     }
   }
-
-  _display =
-      _displayCreator(_config.width * _snakeUnit, _config.height * _snakeUnit);
+  _loadDylib();
 }
 
-Snake::~Snake(void) {
+void Snake::_loadDylib(void) {
+  _dylibIdx = _newDylibIdx;
+  _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
+  if (!_handle) _dlerrorWrapper();
+  _displayCreator =
+      (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
+  if (!_displayCreator) _dlerrorWrapper();
+  _displayDestructor = (void (*)(IDisplay *))dlsym(_handle, "deleteDisplay");
+  if (!_displayDestructor) _dlerrorWrapper();
+  _display =
+      _displayCreator(_config.width * _snakeUnit, _config.height * _snakeUnit);
+  runLoop();
+}
+
+void Snake::_unloadDylib(void) {
   if (_display && _handle) {
-    _displayDestructor = (void (*)(IDisplay *))dlsym(_handle, "deleteDisplay");
-    if (!_displayDestructor) _dlerrorWrapper();
+    _keyMap.clear();
     _displayDestructor(_display);
     dlclose(_handle);
   }
 }
+
+Snake::~Snake(void) { _unloadDylib(); }
 
 void Snake::runLoop(void) {
   if (!_display)
@@ -75,7 +80,10 @@ void Snake::runLoop(void) {
 
     prevTime = currTime;
   }
-  // if (_newDylibIdx != _dylibIdx)
+  if (_newDylibIdx != _dylibIdx) {
+    _unloadDylib();
+    _loadDylib();
+  }
 }
 
 bool Snake::isKeyPressed(std::string key) const {
@@ -101,9 +109,9 @@ void Snake::_handleInput(Player &player) {
 
   player.allDirs.insert(player.allDirs.begin(), player.dir);
   player.allDirs.pop_back();
-  // if (isKeyPressed("1") && _dylibIdx != 1) _newDylibIdx = 1;
-  // if (isKeyPressed("2") && _dylibIdx != 2) _newDylibIdx = 2;
-  // if (isKeyPressed("3") && _dylibIdx != 3) _newDylibIdx = 3;
+  if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
+  if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
+  if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
 }
 
 void Snake::_moveSnake(Player &player, int toCrawl) {

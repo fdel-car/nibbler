@@ -56,6 +56,9 @@ std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
   keyMap[sf::Keyboard::A] = "A";
   keyMap[sf::Keyboard::S] = "S";
   keyMap[sf::Keyboard::D] = "D";
+  keyMap[sf::Keyboard::Num1] = "1";
+  keyMap[sf::Keyboard::Num2] = "2";
+  keyMap[sf::Keyboard::Num3] = "3";
 
   return keyMap;
 }

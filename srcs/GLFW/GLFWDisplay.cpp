@@ -129,6 +129,9 @@ std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
   keyMap[GLFW_KEY_A] = "A";
   keyMap[GLFW_KEY_S] = "S";
   keyMap[GLFW_KEY_D] = "D";
+  keyMap[GLFW_KEY_1] = "1";
+  keyMap[GLFW_KEY_2] = "2";
+  keyMap[GLFW_KEY_3] = "3";
 
   return keyMap;
 }
