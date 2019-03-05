@@ -1,27 +1,30 @@
 #include "Snake.hpp"
 
 Snake::Snake(void)
-    : _dylibIdx(rand() % _dylibsPaths.size()), _twoPlayers(false) {
+    : _dylibIdx(rand() % _dylibsPaths.size()),
+      _twoPlayers(false),
+      _interval(0.2f),
+      _snakeUnit(30.f) {
   _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
   if (!_handle) _dlerrorWrapper();
 
   _displayCreator = (IDisplay * (*)(void)) dlsym(_handle, "createDisplay");
   if (!_displayCreator) _dlerrorWrapper();
 
-  fstPlayer.bodyParts.push_back(glm::vec2(400, 200));
-  fstPlayer.bodyParts.push_back(glm::vec2(400, 250));
-  fstPlayer.bodyParts.push_back(glm::vec2(400, 300));
-  fstPlayer.bodyParts.push_back(glm::vec2(400, 350));
+  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 20 * _snakeUnit));
+  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 21 * _snakeUnit));
+  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 22 * _snakeUnit));
+  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 23 * _snakeUnit));
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
 
   if (_twoPlayers) {
-    sndPlayer.bodyParts.push_back(glm::vec2(130, 100));
-    sndPlayer.bodyParts.push_back(glm::vec2(120, 100));
-    sndPlayer.bodyParts.push_back(glm::vec2(110, 100));
-    sndPlayer.bodyParts.push_back(glm::vec2(100, 100));
+    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 40 * _snakeUnit));
+    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 41 * _snakeUnit));
+    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 42 * _snakeUnit));
+    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 43 * _snakeUnit));
     sndPlayer.allDirs.push_back("UP");
     sndPlayer.allDirs.push_back("UP");
     sndPlayer.allDirs.push_back("UP");
@@ -44,15 +47,29 @@ void Snake::runLoop(void) {
   if (!_display)
     throw std::runtime_error(
         "The graphical interface was not initialzed correctly.");
-  // clock_t updateTime = 0;
+  prevTime = std::chrono::high_resolution_clock::now();
+  size_t frameCount = 0;
+
   while (_display->windowIsOpen()) {
     _display->pollEvent(_keyMap);
     _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
-    // if (clock() > updateTime) {
-    // updateTime = clock() + (0.05 * CLOCKS_PER_SEC);
-    _handleInput(fstPlayer);
-    // if (_twoPlayers) _handleInput(&sndPlayer);
-    // }
+
+    currTime = std::chrono::high_resolution_clock::now();
+    deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(
+                    currTime - prevTime)
+                    .count();
+
+    timeElapsed += deltaTime;
+    fstPlayer.speed = deltaTime * _snakeUnit * (1.f / _interval);
+    if (timeElapsed >= _interval) {
+      _handleInput(fstPlayer);
+      // if (_twoPlayers) _handleInput(sndPlayer);
+      timeElapsed = 0.0;
+      frameCount = 0;
+    }
+    _moveSnake(fstPlayer);
+    prevTime = currTime;
+    frameCount++;
   }
 }
 
@@ -68,52 +85,58 @@ bool Snake::isKeyJustPressed(std::string key) const {
 }
 
 void Snake::_handleInput(Player &player) {
-  if (isKeyPressed("W") && player.dir != "DOWN") player.dir = "UP";
-  if (isKeyPressed("A") && player.dir != "RIGHT") player.dir = "LEFT";
-  if (isKeyPressed("S") && player.dir != "UP") player.dir = "DOWN";
-  if (isKeyPressed("D") && player.dir != "LEFT") player.dir = "RIGHT";
-  _moveSnake(player);
+  if (isKeyPressed("W") && player.dir != "DOWN")
+    player.dir = "UP";
+  else if (isKeyPressed("A") && player.dir != "RIGHT")
+    player.dir = "LEFT";
+  else if (isKeyPressed("S") && player.dir != "UP")
+    player.dir = "DOWN";
+  else if (isKeyPressed("D") && player.dir != "LEFT")
+    player.dir = "RIGHT";
+
+  player.allDirs.insert(player.allDirs.begin(), player.dir);
+  player.allDirs.pop_back();
 }
 
 void Snake::_moveSnake(Player &player) {
-  if (player.dir == "LEFT") player.bodyParts.front().x -= 1;
-  if (player.dir == "RIGHT") player.bodyParts.front().x += 1;
-  if (player.dir == "UP") player.bodyParts.front().y -= 1;
-  if (player.dir == "DOWN") player.bodyParts.front().y += 1;
-  player.allDirs.front() = player.dir;
+  if (player.dir == "LEFT") player.bodyParts.front().x -= player.speed;
+  if (player.dir == "RIGHT") player.bodyParts.front().x += player.speed;
+  if (player.dir == "UP") player.bodyParts.front().y -= player.speed;
+  if (player.dir == "DOWN") player.bodyParts.front().y += player.speed;
 
   glm::vec2 prevPos = player.bodyParts.front();
   for (size_t idx = 1; idx < player.bodyParts.size(); idx++) {
     glm::vec2 &pos = player.bodyParts[idx];
-    std::string &dir = player.allDirs[idx];
+    std::string currDir = player.allDirs[idx];
+    std::string prevDir = player.allDirs[idx - 1];
 
-    if (dir == "UP") {
-      if (prevPos.y < pos.y)
-        pos.y -= 1;
+    if (currDir == "UP") {
+      if (prevPos.y <= pos.y - player.speed)
+        pos.y -= player.speed;
       else {
-        dir = player.allDirs[idx - 1];
-        pos.x += dir == "LEFT" ? -1 : 1;
+        pos.y = prevPos.y;
+        pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
       }
-    } else if (dir == "DOWN") {
-      if (prevPos.y > pos.y)
-        pos.y += 1;
+    } else if (currDir == "DOWN") {
+      if (prevPos.y >= pos.y + player.speed)
+        pos.y += player.speed;
       else {
-        dir = player.allDirs[idx - 1];
-        pos.x += dir == "LEFT" ? -1 : 1;
+        pos.y = prevPos.y;
+        pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
       }
-    } else if (dir == "LEFT") {
-      if (prevPos.x < pos.x)
-        pos.x -= 1;
+    } else if (currDir == "LEFT") {
+      if (prevPos.x <= pos.x - player.speed)
+        pos.x -= player.speed;
       else {
-        dir = player.allDirs[idx - 1];
-        pos.y += dir == "UP" ? -1 : 1;
+        pos.x = prevPos.x;
+        pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
       }
-    } else if (dir == "RIGHT") {
-      if (prevPos.x > pos.x)
-        pos.x += 1;
+    } else if (currDir == "RIGHT") {
+      if (prevPos.x >= pos.x + player.speed)
+        pos.x += player.speed;
       else {
-        dir = player.allDirs[idx - 1];
-        pos.y += dir == "UP" ? -1 : 1;
+        pos.x = prevPos.x;
+        pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
       }
     }
     prevPos = pos;

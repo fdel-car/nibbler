@@ -6,21 +6,26 @@
 
 class Circle {
  public:
-  Circle(glm::vec2 const &pos);
+  Circle(float radius);
+  Circle(Circle const &src);
 
   virtual ~Circle(void);
 
   void render(ShaderProgram const &shaderProgram);
+  void setPosition(glm::vec2 const &pos);
+  float getRadius(void) const;
+  glm::mat4 const &getModelMatrix(void) const;
+  std::vector<glm::vec3> const &getVertices(void) const;
+
+  Circle &operator=(Circle const &rhs);
 
  private:
   GLuint _VAO, _VBO;
+  float _radius;
   std::vector<glm::vec3> _vertices;
-
-  static const float _radius;
+  glm::mat4 _modelMatrix = glm::mat4(1.f);
 
   Circle(void);
 
-  Circle(Circle const &src);
-
-  Circle &operator=(Circle const &rhs);
+  void _initBuffers(void);
 };

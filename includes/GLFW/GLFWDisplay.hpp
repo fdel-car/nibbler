@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "GLFW/Circle.hpp"
 #include "GLFW/Headers.hpp"
 #include "GLFW/ShaderProgram.hpp"
 
@@ -20,6 +21,8 @@ class GLFWDisplay : public IDisplay {
   GLFWwindow *_window = nullptr;
   ShaderProgram *_shaderProgram = nullptr;
   // glm::mat4 _projectionMatrix, viewMatrix;
+  std::vector<Circle> _fstBody;
+  std::vector<Circle> _sndBody;
 
   static std::vector<std::string> _keyPressed;
   static std::vector<std::string> _keyReleased;
@@ -29,6 +32,8 @@ class GLFWDisplay : public IDisplay {
 
   void _initContext(void);
   void _centerWindow(GLFWmonitor *monitor);
+  void _drawSnake(std::vector<glm::vec2> const &snakeCoords,
+                  std::vector<Circle> *bodySnake);
 
   static void _keyCallback(GLFWwindow *window, int key, int scancode,
                            int action, int mods);

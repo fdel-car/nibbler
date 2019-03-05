@@ -12,7 +12,7 @@
 
 struct Player {
   std::string dir = "UP";
-  // TODO: Speed coefficient maybe?
+  float speed = 1.f;
   std::vector<glm::vec2> bodyParts;
   std::vector<std::string> allDirs;
 };
@@ -21,6 +21,9 @@ class Snake {
  public:
   Snake(void);
   virtual ~Snake(void);
+
+  std::chrono::high_resolution_clock::time_point currTime, prevTime;
+  double deltaTime, timeElapsed = 0.0;
 
   void runLoop(void);
   bool isKeyPressed(std::string key) const;
@@ -36,6 +39,8 @@ class Snake {
   Player fstPlayer;
   Player sndPlayer;
   bool _twoPlayers;
+  float _interval;
+  float const _snakeUnit;
 
   static std::vector<std::string> _dylibsPaths;
 

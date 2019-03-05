@@ -73,30 +73,34 @@ bool GLFWDisplay::windowIsOpen(void) const {
 
 void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   glfwPollEvents();
-  for (auto key : _keyPressed) keyMap[key].currFrame = true;
+  for (auto key : _keyPressed) {
+    if (key == "ESC") glfwSetWindowShouldClose(_window, GL_TRUE);
+    keyMap[key].currFrame = true;
+  }
   for (auto key : _keyReleased) keyMap[key].currFrame = false;
   _keyPressed.clear();
   _keyReleased.clear();
 }
 
+void GLFWDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords,
+                             std::vector<Circle> *bodySnake) {
+  size_t bodySize = bodySnake->size();
+  for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
+    bodySnake->emplace_back(15.f);
+  }
+  for (size_t i = 0; i < snakeCoords.size(); i++) {
+    bodySnake->at(i).setPosition(snakeCoords.at(i));
+    bodySnake->at(i).render(*_shaderProgram);
+  }
+}
+
 void GLFWDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
                               std::vector<glm::vec2> const &sndCoords) {
-  glClearColor(0.2f, 0.2f, 0.2f, 1.f);
+  glClearColor(0.1f, 0.1f, 0.1f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
-
-  // TODO: Avoid that reinitialization every frame
-  for (auto coords : fstCoords) {
-    Circle bodyPart(coords);
-    bodyPart.render(*_shaderProgram);
-  }
-
-  // for (auto coords : sndCoords) {
-  //   Circle bodyPart(coords);
-  //   bodyPart.render(*_shaderProgram);
-  // }
-
+  _drawSnake(fstCoords, &_fstBody);
+  if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   glfwSwapBuffers(_window);
-  (void)sndCoords;
 }
 
 std::vector<std::string> GLFWDisplay::_keyPressed = std::vector<std::string>();
@@ -121,6 +125,7 @@ void GLFWDisplay::_keyCallback(GLFWwindow *window, int key, int scancode,
 std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
   std::map<ushort, std::string> keyMap;
 
+  keyMap[GLFW_KEY_ESCAPE] = "ESC";
   keyMap[GLFW_KEY_W] = "W";
   keyMap[GLFW_KEY_A] = "A";
   keyMap[GLFW_KEY_S] = "S";
