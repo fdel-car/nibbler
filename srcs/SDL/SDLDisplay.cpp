@@ -33,14 +33,16 @@ bool SDLDisplay::windowIsOpen(void) const { return _isOpen; }
 
 void SDLDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   while (SDL_PollEvent(&_event)) {
-    if (_event.type == SDL_KEYDOWN)
-      keyMap[_keyMap[_event.key.keysym.sym]].currFrame = true;
-    if (_event.type == SDL_KEYUP)
-      keyMap[_keyMap[_event.key.keysym.sym]].currFrame = false;
+    if (_event.type == SDL_QUIT) _isOpen = false;
 
-    // TODO: Remove
-    if (_event.type == SDL_QUIT) {
-      _isOpen = false;
+    if (_event.type == SDL_KEYDOWN || _event.type == SDL_KEYUP) {
+      auto it = _keyMap.find(_event.key.keysym.sym);
+      if (it == _keyMap.end()) continue;
+      if (_event.type == SDL_KEYDOWN) {
+        if (it->second == "ESC") _isOpen = false;
+        keyMap[it->second].currFrame = true;
+      } else
+        keyMap[it->second].currFrame = false;
     }
   }
 }
@@ -75,28 +77,24 @@ void SDLDisplay::_drawCircle(int _x, int _y, int radius) {
   }
 }
 
-void SDLDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords) {
+void SDLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords) {
   for (size_t i = 0; i < snakeCoords.size(); i++) {
-    _drawCircle(snakeCoords.at(i).x, snakeCoords.at(i).y, 5);
+    _drawCircle(snakeCoords.at(i).x, snakeCoords.at(i).y, 15);
   }
 }
 
-void SDLDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
-                             std::vector<glm::vec2> const &sndCoords) {
+void SDLDisplay::renderScene(std::vector<glm::ivec2> const &fstCoords,
+                             std::vector<glm::ivec2> const &sndCoords) {
   SDL_RenderClear(_renderer);
   _drawSnake(fstCoords);
   if (sndCoords.size() != 0) _drawSnake(sndCoords);
-  // SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
-
-  // _drawCircle(200, 200, 10);
   SDL_RenderPresent(_renderer);
-  (void)fstCoords;
-  (void)sndCoords;
 }
 
 std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {
   std::map<ushort, std::string> keyMap;
 
+  keyMap[SDLK_ESCAPE] = "ESC";
   keyMap[SDLK_w] = "W";
   keyMap[SDLK_a] = "A";
   keyMap[SDLK_s] = "S";

@@ -4,7 +4,7 @@ Snake::Snake(Config config)
     : _config(config),
       _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
-      _snakeUnit(30.f) {
+      _snakeUnit(30) {
   _newDylibIdx = _dylibIdx;
 
   _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
@@ -14,27 +14,25 @@ Snake::Snake(Config config)
       (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
   if (!_displayCreator) _dlerrorWrapper();
 
-  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 20 * _snakeUnit));
-  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 21 * _snakeUnit));
-  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 22 * _snakeUnit));
-  fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 23 * _snakeUnit));
-  fstPlayer.allDirs.push_back("UP");
-  fstPlayer.allDirs.push_back("UP");
-  fstPlayer.allDirs.push_back("UP");
-  fstPlayer.allDirs.push_back("UP");
+  int xPos = _config.width / 3;
+  int yPos = _config.height / 3;
 
-  if (_config.twoPlayers) {
-    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 40 * _snakeUnit));
-    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 41 * _snakeUnit));
-    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 42 * _snakeUnit));
-    sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 43 * _snakeUnit));
-    sndPlayer.allDirs.push_back("UP");
-    sndPlayer.allDirs.push_back("UP");
-    sndPlayer.allDirs.push_back("UP");
-    sndPlayer.allDirs.push_back("UP");
+  for (ushort i = 0; i < 4; i++) {
+    fstPlayer.bodyParts.push_back(
+        glm::ivec2(xPos * _snakeUnit, (yPos + i) * _snakeUnit));
+    fstPlayer.allDirs.push_back("UP");
   }
 
-  _display = _displayCreator(_config.width, _config.height);
+  if (_config.twoPlayers) {
+    for (ushort i = 0; i < 4; i++) {
+      sndPlayer.bodyParts.push_back(
+          glm::ivec2(xPos * 2 * _snakeUnit, (yPos * 2 + i) * _snakeUnit));
+      sndPlayer.allDirs.push_back("UP");
+    }
+  }
+
+  _display =
+      _displayCreator(_config.width * _snakeUnit, _config.height * _snakeUnit);
 }
 
 Snake::~Snake(void) {
@@ -51,8 +49,6 @@ void Snake::runLoop(void) {
     throw std::runtime_error(
         "The graphical interface was not initialzed correctly.");
   prevTime = std::chrono::high_resolution_clock::now();
-  size_t frameCount = 0;
-
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
     _display->pollEvent(_keyMap);
@@ -63,17 +59,21 @@ void Snake::runLoop(void) {
                     currTime - prevTime)
                     .count();
 
-    timeElapsed += deltaTime;
-    fstPlayer.speed = deltaTime * _snakeUnit * (1.f / _interval);
-    if (timeElapsed >= _interval) {
+    // Kind of handlePlayer instructions (should be separated)
+    fstPlayer.distCrawled += deltaTime * _snakeUnit * (1.f / _interval);
+    int toCrawl = (int)fstPlayer.distCrawled - fstPlayer.prevCrawled;
+    if ((int)fstPlayer.distCrawled >= _snakeUnit) {
+      fstPlayer.distCrawled = fmod(fstPlayer.distCrawled, (float)_snakeUnit);
+      toCrawl -= (int)fstPlayer.distCrawled;
+      fstPlayer.prevCrawled = 0;
+      if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
       _handleInput(fstPlayer);
-      if (_config.twoPlayers) _handleInput(sndPlayer);
-      timeElapsed = 0.0;
-      frameCount = 0;
+    } else {
+      if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
+      fstPlayer.prevCrawled += toCrawl;
     }
-    _moveSnake(fstPlayer);
+
     prevTime = currTime;
-    frameCount++;
   }
   // if (_newDylibIdx != _dylibIdx)
 }
@@ -106,49 +106,49 @@ void Snake::_handleInput(Player &player) {
   // if (isKeyPressed("3") && _dylibIdx != 3) _newDylibIdx = 3;
 }
 
-void Snake::_moveSnake(Player &player) {
-  if (player.dir == "LEFT") player.bodyParts.front().x -= player.speed;
-  if (player.dir == "RIGHT") player.bodyParts.front().x += player.speed;
-  if (player.dir == "UP") player.bodyParts.front().y -= player.speed;
-  if (player.dir == "DOWN") player.bodyParts.front().y += player.speed;
+void Snake::_moveSnake(Player &player, int toCrawl) {
+  if (player.dir == "LEFT") player.bodyParts.front().x -= toCrawl;
+  if (player.dir == "RIGHT") player.bodyParts.front().x += toCrawl;
+  if (player.dir == "UP") player.bodyParts.front().y -= toCrawl;
+  if (player.dir == "DOWN") player.bodyParts.front().y += toCrawl;
 
-  glm::vec2 prevPos = player.bodyParts.front();
-  for (size_t idx = 1; idx < player.bodyParts.size(); idx++) {
-    glm::vec2 &pos = player.bodyParts[idx];
-    std::string currDir = player.allDirs[idx];
-    std::string prevDir = player.allDirs[idx - 1];
+  // glm::ivec2 prevPos = player.bodyParts.front();
+  // for (size_t idx = 1; idx < player.bodyParts.size(); idx++) {
+  //   glm::ivec2 &pos = player.bodyParts[idx];
+  //   std::string currDir = player.allDirs[idx];
+  //   std::string prevDir = player.allDirs[idx - 1];
 
-    if (currDir == "UP") {
-      if (prevPos.y <= pos.y - player.speed)
-        pos.y -= player.speed;
-      else {
-        pos.y = prevPos.y;
-        pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
-      }
-    } else if (currDir == "DOWN") {
-      if (prevPos.y >= pos.y + player.speed)
-        pos.y += player.speed;
-      else {
-        pos.y = prevPos.y;
-        pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
-      }
-    } else if (currDir == "LEFT") {
-      if (prevPos.x <= pos.x - player.speed)
-        pos.x -= player.speed;
-      else {
-        pos.x = prevPos.x;
-        pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
-      }
-    } else if (currDir == "RIGHT") {
-      if (prevPos.x >= pos.x + player.speed)
-        pos.x += player.speed;
-      else {
-        pos.x = prevPos.x;
-        pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
-      }
-    }
-    prevPos = pos;
-  }
+  //   if (currDir == "UP") {
+  //     if (prevPos.y <= pos.y - player.speed)
+  //       pos.y -= player.speed;
+  //     else {
+  //       pos.y = prevPos.y;
+  //       pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
+  //     }
+  //   } else if (currDir == "DOWN") {
+  //     if (prevPos.y >= pos.y + player.speed)
+  //       pos.y += player.speed;
+  //     else {
+  //       pos.y = prevPos.y;
+  //       pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
+  //     }
+  //   } else if (currDir == "LEFT") {
+  //     if (prevPos.x <= pos.x - player.speed)
+  //       pos.x -= player.speed;
+  //     else {
+  //       pos.x = prevPos.x;
+  //       pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
+  //     }
+  //   } else if (currDir == "RIGHT") {
+  //     if (prevPos.x >= pos.x + player.speed)
+  //       pos.x += player.speed;
+  //     else {
+  //       pos.x = prevPos.x;
+  //       pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
+  //     }
+  //   }
+  //   prevPos = pos;
+  // }
 
   // // Debug
   // for (auto dir : player.allDirs) {
@@ -162,9 +162,9 @@ void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
 std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
-  // vector.push_back("./dylibs/GLFWDisplay.so");
+  vector.push_back("./dylibs/GLFWDisplay.so");
   vector.push_back("./dylibs/SDLDisplay.so");
-  // vector.push_back("./dylibs/SFMLDisplay.so");
+  vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;
 }

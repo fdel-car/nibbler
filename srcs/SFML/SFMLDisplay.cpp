@@ -2,7 +2,7 @@
 
 SFMLDisplay::SFMLDisplay(int w, int h)
     : _window(sf::VideoMode(w, h), "Nibbler - SFML", sf::Style::Close) {
-  std::cout << "SFML start" << std::endl;		
+  std::cout << "SFML start" << std::endl;
   _window.setFramerateLimit(60);
 }
 
@@ -28,7 +28,7 @@ void SFMLDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   }
 }
 
-void SFMLDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords,
+void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                              std::vector<sf::CircleShape> *bodySnake) {
   size_t bodySize = bodySnake->size();
   for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
@@ -40,8 +40,8 @@ void SFMLDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords,
   }
 }
 
-void SFMLDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
-                              std::vector<glm::vec2> const &sndCoords) {
+void SFMLDisplay::renderScene(std::vector<glm::ivec2> const &fstCoords,
+                              std::vector<glm::ivec2> const &sndCoords) {
   _window.clear(sf::Color::Black);
   _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);

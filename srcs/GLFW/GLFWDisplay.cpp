@@ -6,8 +6,7 @@ GLFWDisplay::GLFWDisplay(int w, int h) {
   _shaderProgram = new ShaderProgram("./srcs/GLFW/shaders/default.vs",
                                      "./srcs/GLFW/shaders/default.fs");
 
-  glm::mat4 projectionMatrix =
-      glm::ortho<float>(0, w, h, 0, 0.1f, 100);
+  glm::mat4 projectionMatrix = glm::ortho<float>(0, w, h, 0, 0.1f, 100);
   glm::mat4 viewMatrix =
       glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -10.f));
 
@@ -82,7 +81,7 @@ void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   _keyReleased.clear();
 }
 
-void GLFWDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords,
+void GLFWDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                              std::vector<Circle> *bodySnake) {
   size_t bodySize = bodySnake->size();
   for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
@@ -94,8 +93,8 @@ void GLFWDisplay::_drawSnake(std::vector<glm::vec2> const &snakeCoords,
   }
 }
 
-void GLFWDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
-                              std::vector<glm::vec2> const &sndCoords) {
+void GLFWDisplay::renderScene(std::vector<glm::ivec2> const &fstCoords,
+                              std::vector<glm::ivec2> const &sndCoords) {
   glClearColor(0.1f, 0.1f, 0.1f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   _drawSnake(fstCoords, &_fstBody);

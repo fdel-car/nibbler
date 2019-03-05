@@ -19,7 +19,9 @@ struct Config {
 struct Player {
   std::string dir = "UP";
   float speed = 1.f;
-  std::vector<glm::vec2> bodyParts;
+  float distCrawled = 0.f;
+  int prevCrawled = 0;
+  std::vector<glm::ivec2> bodyParts;
   std::vector<std::string> allDirs;
 };
 
@@ -47,7 +49,7 @@ class Snake {
   Player fstPlayer;
   Player sndPlayer;
   float _interval;
-  float const _snakeUnit;
+  int const _snakeUnit;
 
   static std::vector<std::string> _dylibsPaths;
 
@@ -56,7 +58,7 @@ class Snake {
 
   void _dlerrorWrapper(void);
   void _handleInput(Player &player);
-  void _moveSnake(Player &player);
+  void _moveSnake(Player &player, int toCrawl);
   static std::vector<std::string> _initDylibsPaths(void);
 
   Snake &operator=(Snake const &rhs);

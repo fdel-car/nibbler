@@ -12,7 +12,7 @@ class Circle {
   virtual ~Circle(void);
 
   void render(ShaderProgram const &shaderProgram);
-  void setPosition(glm::vec2 const &pos);
+  void setPosition(glm::ivec2 const &pos);
   float getRadius(void) const;
   glm::mat4 const &getModelMatrix(void) const;
   std::vector<glm::vec3> const &getVertices(void) const;

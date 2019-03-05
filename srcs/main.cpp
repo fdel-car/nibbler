@@ -17,15 +17,14 @@ int main(int ac, char **av) {
       Config config;
       config.width = std::stoi(av[1]);
       config.height = std::stoi(av[2]);
-      if (config.width >= 400 && config.width <= 2000 && config.height >= 400 &&
-          config.height <= 2000) {
+      if (config.width >= 20 && config.width <= 40 && config.height >= 20 &&
+          config.height <= 40) {
         for (int i = 3; i < ac; i++) {
           if (strcmp(av[i], "-m") == 0)
             config.twoPlayers = true;
           else
             usage();
         }
-		std::cout << "Start game" << std::endl;
         Snake game(config);
         game.runLoop();
       }

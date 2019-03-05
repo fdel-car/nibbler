@@ -12,8 +12,8 @@ class SDLDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(std::vector<glm::vec2> const &fstCoords,
-                   std::vector<glm::vec2> const &sndCoords);
+  void renderScene(std::vector<glm::ivec2> const &fstCoords,
+                   std::vector<glm::ivec2> const &sndCoords);
 
  private:
   SDL_Window *_window = NULL;
@@ -28,7 +28,7 @@ class SDLDisplay : public IDisplay {
 
   SDLDisplay &operator=(SDLDisplay const &rhs);
 
-  void _drawSnake(std::vector<glm::vec2> const &snakeCoords);
+  void _drawSnake(std::vector<glm::ivec2> const &snakeCoords);
   void _drawCircle(int _x, int _y, int radius);
 
   static std::map<ushort, std::string> _initKeyMap(void);

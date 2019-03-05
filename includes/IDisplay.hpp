@@ -22,9 +22,8 @@ class IDisplay {
  public:
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
-  virtual void renderScene(std::vector<glm::vec2> const &fstCoords,
-                           std::vector<glm::vec2> const &sndCoords) = 0;
-  // virtual void setEvents(std::unordered_map<int, bool> *inputsPressed) = 0;
+  virtual void renderScene(std::vector<glm::ivec2> const &fstCoords,
+                           std::vector<glm::ivec2> const &sndCoords) = 0;
 
   virtual ~IDisplay(){};
 };

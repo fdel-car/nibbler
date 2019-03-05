@@ -2,7 +2,7 @@
 
 Circle::Circle(float radius) : _radius(radius) {
   _vertices = {glm::vec3(_radius, _radius, 0.f)};
-  for (size_t idx = 0; idx < 360; idx++) {
+  for (size_t idx = 0; idx <= 360; idx++) {
     float theta = glm::radians((float)idx);
     _vertices.push_back(
         glm::vec3(_radius * cos(theta), _radius * sin(theta), 0.f) +
@@ -44,9 +44,9 @@ std::vector<glm::vec3> const &Circle::getVertices(void) const {
   return _vertices;
 }
 
-void Circle::setPosition(glm::vec2 const &pos) {
-  _modelMatrix[3][0] = pos.x;
-  _modelMatrix[3][1] = pos.y;
+void Circle::setPosition(glm::ivec2 const &pos) {
+  _modelMatrix[3][0] = (float)pos.x;
+  _modelMatrix[3][1] = (float)pos.y;
 }
 
 void Circle::render(ShaderProgram const &shaderProgram) {
