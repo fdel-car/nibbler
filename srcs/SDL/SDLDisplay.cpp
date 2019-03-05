@@ -101,6 +101,9 @@ std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {
   keyMap[SDLK_a] = "A";
   keyMap[SDLK_s] = "S";
   keyMap[SDLK_d] = "D";
+  keyMap[SDLK_1] = "1";
+  keyMap[SDLK_2] = "2";
+  keyMap[SDLK_3] = "3";
 
   return keyMap;
 }

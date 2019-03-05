@@ -6,14 +6,6 @@ Snake::Snake(Config config)
       _interval(0.2f),
       _snakeUnit(30.f) {
   _newDylibIdx = _dylibIdx;
-
-  _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
-  if (!_handle) _dlerrorWrapper();
-
-  _displayCreator =
-      (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
-  if (!_displayCreator) _dlerrorWrapper();
-
   fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 20 * _snakeUnit));
   fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 21 * _snakeUnit));
   fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 22 * _snakeUnit));
@@ -34,16 +26,33 @@ Snake::Snake(Config config)
     sndPlayer.allDirs.push_back("UP");
   }
 
-  _display = _displayCreator(_config.width, _config.height);
+  _unloadDylib();
+  _loadDylib();
+}
+
+void Snake::_loadDylib(void) {
+	_dylibIdx = _newDylibIdx;
+	_handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
+    if (!_handle) _dlerrorWrapper();
+    _displayCreator =
+  	  (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
+    if (!_displayCreator) _dlerrorWrapper();
+    _displayDestructor = (void (*)(IDisplay *))dlsym(_handle, "deleteDisplay");
+    if (!_displayDestructor) _dlerrorWrapper();
+	_display = _displayCreator(_config.width, _config.height);
+	runLoop();
+}
+
+void Snake::_unloadDylib(void) {
+	if (_display && _handle) {
+	  _keyMap.clear();
+      _displayDestructor(_display);
+      dlclose(_handle);
+    }
 }
 
 Snake::~Snake(void) {
-  if (_display && _handle) {
-    _displayDestructor = (void (*)(IDisplay *))dlsym(_handle, "deleteDisplay");
-    if (!_displayDestructor) _dlerrorWrapper();
-    _displayDestructor(_display);
-    dlclose(_handle);
-  }
+  _unloadDylib();
 }
 
 void Snake::runLoop(void) {
@@ -75,7 +84,10 @@ void Snake::runLoop(void) {
     prevTime = currTime;
     frameCount++;
   }
-  // if (_newDylibIdx != _dylibIdx)
+  if (_newDylibIdx != _dylibIdx) {
+    _unloadDylib();
+    _loadDylib();
+  }
 }
 
 bool Snake::isKeyPressed(std::string key) const {
@@ -101,9 +113,9 @@ void Snake::_handleInput(Player &player) {
 
   player.allDirs.insert(player.allDirs.begin(), player.dir);
   player.allDirs.pop_back();
-  // if (isKeyPressed("1") && _dylibIdx != 1) _newDylibIdx = 1;
-  // if (isKeyPressed("2") && _dylibIdx != 2) _newDylibIdx = 2;
-  // if (isKeyPressed("3") && _dylibIdx != 3) _newDylibIdx = 3;
+  if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
+  if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
+  if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
 }
 
 void Snake::_moveSnake(Player &player) {
@@ -162,9 +174,9 @@ void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
 std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
-  // vector.push_back("./dylibs/GLFWDisplay.so");
+  vector.push_back("./dylibs/GLFWDisplay.so");
   vector.push_back("./dylibs/SDLDisplay.so");
-  // vector.push_back("./dylibs/SFMLDisplay.so");
+  vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;
 }

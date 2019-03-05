@@ -57,6 +57,8 @@ class Snake {
   void _dlerrorWrapper(void);
   void _handleInput(Player &player);
   void _moveSnake(Player &player);
+  void _loadDylib(void);
+  void _unloadDylib(void);
   static std::vector<std::string> _initDylibsPaths(void);
 
   Snake &operator=(Snake const &rhs);

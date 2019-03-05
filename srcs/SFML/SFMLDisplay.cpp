@@ -2,7 +2,7 @@
 
 SFMLDisplay::SFMLDisplay(int w, int h)
     : _window(sf::VideoMode(w, h), "Nibbler - SFML", sf::Style::Close) {
-  std::cout << "SFML start" << std::endl;		
+  std::cout << "SFML start" << std::endl;
   _window.setFramerateLimit(60);
 }
 
@@ -56,6 +56,9 @@ std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
   keyMap[sf::Keyboard::A] = "A";
   keyMap[sf::Keyboard::S] = "S";
   keyMap[sf::Keyboard::D] = "D";
+  keyMap[sf::Keyboard::Num1] = "1";
+  keyMap[sf::Keyboard::Num2] = "2";
+  keyMap[sf::Keyboard::Num3] = "3";
 
   return keyMap;
 }
