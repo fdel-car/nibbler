@@ -35,6 +35,7 @@ class Snake {
  private:
   Configs _configs;
   size_t _dylibIdx;
+  size_t _newdylibIdx;
   void *_handle = nullptr;
   IDisplay *(*_displayCreator)(int w, int h);
   void (*_displayDestructor)(IDisplay *);
@@ -42,7 +43,6 @@ class Snake {
   std::map<std::string, KeyState> _keyMap;
   Player fstPlayer;
   Player sndPlayer;
-  // bool _twoPlayers;
 
   static std::vector<std::string> _dylibsPaths;
 

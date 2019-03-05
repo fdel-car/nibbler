@@ -46,6 +46,7 @@ void Snake::runLoop(void) {
         "The graphical interface was not initialzed correctly.");
   // clock_t updateTime = 0;
   while (_display->windowIsOpen()) {
+	if (_newdylibIdx != _dylibIdx) break ;
     _display->pollEvent(_keyMap);
     _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
     // if (clock() > updateTime) {
@@ -54,6 +55,8 @@ void Snake::runLoop(void) {
     // if (_configs.twoPlayers) _handleInput(sndPlayer);
     // }
   }
+  // if (_newdylibIdx != _dylibIdx)
+
 }
 
 bool Snake::isKeyPressed(std::string key) const {
@@ -68,6 +71,9 @@ bool Snake::isKeyJustPressed(std::string key) const {
 }
 
 void Snake::_handleInput(Player &player) {
+  // if (isKeyPressed("1") && _dylibIdx != 1) _newdylibIdx = 1;
+  // if (isKeyPressed("2") && _dylibIdx != 2) _newdylibIdx = 2;
+  // if (isKeyPressed("3") && _dylibIdx != 3) _newdylibIdx = 3;
   if (isKeyPressed("W") && player.dir != "DOWN") player.dir = "UP";
   if (isKeyPressed("A") && player.dir != "RIGHT") player.dir = "LEFT";
   if (isKeyPressed("S") && player.dir != "UP") player.dir = "DOWN";
