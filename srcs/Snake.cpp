@@ -1,11 +1,11 @@
 #include "Snake.hpp"
 
-Snake::Snake(void)
-    : _dylibIdx(rand() % _dylibsPaths.size()), _twoPlayers(false) {
+Snake::Snake(Configs configs)
+    : _configs(configs), _dylibIdx(rand() % _dylibsPaths.size()) {
   _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
   if (!_handle) _dlerrorWrapper();
 
-  _displayCreator = (IDisplay * (*)(void)) dlsym(_handle, "createDisplay");
+  _displayCreator = (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
   if (!_displayCreator) _dlerrorWrapper();
 
   fstPlayer.bodyParts.push_back(glm::vec2(400, 200));
@@ -17,7 +17,7 @@ Snake::Snake(void)
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
 
-  if (_twoPlayers) {
+  if (_configs.twoPlayers) {
     sndPlayer.bodyParts.push_back(glm::vec2(130, 100));
     sndPlayer.bodyParts.push_back(glm::vec2(120, 100));
     sndPlayer.bodyParts.push_back(glm::vec2(110, 100));
@@ -28,7 +28,7 @@ Snake::Snake(void)
     sndPlayer.allDirs.push_back("UP");
   }
 
-  _display = _displayCreator();
+  _display = _displayCreator(_configs.width, _configs.height);
 }
 
 Snake::~Snake(void) {
@@ -49,9 +49,9 @@ void Snake::runLoop(void) {
     _display->pollEvent(_keyMap);
     _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
     // if (clock() > updateTime) {
-    // updateTime = clock() + (0.05 * CLOCKS_PER_SEC);
-    _handleInput(fstPlayer);
-    // if (_twoPlayers) _handleInput(&sndPlayer);
+	    // updateTime = clock() + (0.5 * CLOCKS_PER_SEC);
+	_handleInput(fstPlayer);
+    // if (_configs.twoPlayers) _handleInput(sndPlayer);
     // }
   }
 }
@@ -132,6 +132,7 @@ std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
   vector.push_back("./dylibs/GLFWDisplay.so");
+  vector.push_back("./dylibs/SDLDisplay.so");
   vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;

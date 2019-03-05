@@ -1,7 +1,7 @@
 #include "SFML/SFMLDisplay.hpp"
 
-SFMLDisplay::SFMLDisplay(void)
-    : _window(sf::VideoMode(WIDTH, HEIGHT), "Nibbler - SFML",
+SFMLDisplay::SFMLDisplay(int w, int h)
+    : _window(sf::VideoMode(w, h), "Nibbler - SFML",
               sf::Style::Close) {}
 
 SFMLDisplay::~SFMLDisplay(void) {}
@@ -56,6 +56,6 @@ std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
 
 std::map<ushort, std::string> SFMLDisplay::_keyMap = _initKeyMap();
 
-SFMLDisplay *createDisplay(void) { return new SFMLDisplay(); }
+SFMLDisplay *createDisplay(int w, int h) { return new SFMLDisplay(w, h); }
 
 void deleteDisplay(SFMLDisplay *display) { delete display; }

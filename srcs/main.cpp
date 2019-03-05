@@ -1,13 +1,36 @@
 #include "Snake.hpp"
 
+static bool is_number(const std::string& s) {
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
+static void usage() {
+	std::cerr << "Bad formatage." << std::endl;
+}
+
 int main(int ac, char **av) {
   srand(time(nullptr));
   try {
     // TODO: Map size parsing and stuff
-    (void)ac;
-    (void)av;
-    Snake game;
-    game.runLoop();
+	if (ac > 2 && is_number(av[1]) && is_number(av[2]) &&
+			strlen(av[1]) < 9 && strlen(av[2]) < 9) {
+		Configs configs;
+		configs.width = std::stoi(av[1]);
+		configs.height = std::stoi(av[2]);
+		if (configs.width >= 400 && configs.width <= 2000 &&
+				configs.height >= 400 && configs.height <= 2000) {
+			for (int i = 3; i < ac; i++) {
+				if (strcmp(av[i], "-m") == 0)
+					configs.twoPlayers = true;
+				else
+					usage();
+			}
+
+		    Snake game(configs);
+		    game.runLoop();
+		}
+	}
     return EXIT_SUCCESS;
   } catch (std::runtime_error const &err) {
     std::cerr << "Error: " << err.what() << std::endl;

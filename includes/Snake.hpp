@@ -10,6 +10,12 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+struct Configs {
+  int width;
+  int height;
+  bool twoPlayers = false;
+};
+
 struct Player {
   std::string dir = "UP";
   // TODO: Speed coefficient maybe?
@@ -19,7 +25,7 @@ struct Player {
 
 class Snake {
  public:
-  Snake(void);
+  Snake(Configs configs);
   virtual ~Snake(void);
 
   void runLoop(void);
@@ -27,18 +33,20 @@ class Snake {
   bool isKeyJustPressed(std::string key) const;
 
  private:
+  Configs _configs;
   size_t _dylibIdx;
   void *_handle = nullptr;
-  IDisplay *(*_displayCreator)(void);
+  IDisplay *(*_displayCreator)(int w, int h);
   void (*_displayDestructor)(IDisplay *);
   IDisplay *_display = nullptr;
   std::map<std::string, KeyState> _keyMap;
   Player fstPlayer;
   Player sndPlayer;
-  bool _twoPlayers;
+  // bool _twoPlayers;
 
   static std::vector<std::string> _dylibsPaths;
 
+  Snake(void);
   Snake(Snake const &src);
 
   void _dlerrorWrapper(void);
