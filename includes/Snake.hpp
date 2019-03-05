@@ -38,7 +38,7 @@ class Snake {
  private:
   Config _config;
   size_t _dylibIdx;
-  size_t _newdylibIdx;
+  size_t _newDylibIdx;
   void *_handle = nullptr;
   IDisplay *(*_displayCreator)(int w, int h);
   void (*_displayDestructor)(IDisplay *);
