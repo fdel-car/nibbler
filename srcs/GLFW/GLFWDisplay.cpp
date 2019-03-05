@@ -1,13 +1,13 @@
 #include "GLFW/GLFWDisplay.hpp"
 #include "GLFW/Circle.hpp"
 
-GLFWDisplay::GLFWDisplay(void) {
-  _initContext();
+GLFWDisplay::GLFWDisplay(int w, int h) {
+  _initContext(w, h);
   _shaderProgram = new ShaderProgram("./srcs/GLFW/shaders/default.vs",
                                      "./srcs/GLFW/shaders/default.fs");
 
   glm::mat4 projectionMatrix =
-      glm::ortho<float>(0, WIDTH, HEIGHT, 0, 0.1f, 100);
+      glm::ortho<float>(0, w, h, 0, 0.1f, 100);
   glm::mat4 viewMatrix =
       glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -10.f));
 
@@ -20,7 +20,7 @@ GLFWDisplay::~GLFWDisplay(void) {
   glfwTerminate();
 }
 
-void GLFWDisplay::_initContext(void) {
+void GLFWDisplay::_initContext(int w, int h) {
   if (!glfwInit()) throw std::runtime_error("Failed to initialize GLFW");
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -31,7 +31,7 @@ void GLFWDisplay::_initContext(void) {
 #endif
   glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
   glfwWindowHint(GLFW_SAMPLES, 4);
-  _window = glfwCreateWindow(WIDTH, HEIGHT, "Nibbler - GLFW", nullptr, nullptr);
+  _window = glfwCreateWindow(w, h, "Nibbler - GLFW", nullptr, nullptr);
   if (!_window) {
     glfwTerminate();
     throw std::runtime_error("Failed to create windows GLFW");
@@ -136,6 +136,6 @@ std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
 
 std::map<ushort, std::string> GLFWDisplay::_keyMap = _initKeyMap();
 
-GLFWDisplay *createDisplay(void) { return new GLFWDisplay(); }
+GLFWDisplay *createDisplay(int w, int h) { return new GLFWDisplay(w, h); }
 
 void deleteDisplay(GLFWDisplay *display) { delete display; }

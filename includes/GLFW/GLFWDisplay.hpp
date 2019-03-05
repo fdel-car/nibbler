@@ -8,7 +8,7 @@
 
 class GLFWDisplay : public IDisplay {
  public:
-  GLFWDisplay(void);
+  GLFWDisplay(int w, int h);
   virtual ~GLFWDisplay(void);
 
   bool windowIsOpen(void) const;
@@ -28,9 +28,10 @@ class GLFWDisplay : public IDisplay {
   static std::vector<std::string> _keyReleased;
   static std::map<ushort, std::string> _keyMap;
 
+  GLFWDisplay(void);
   GLFWDisplay(GLFWDisplay const &src);
 
-  void _initContext(void);
+  void _initContext(int w, int h);
   void _centerWindow(GLFWmonitor *monitor);
   void _drawSnake(std::vector<glm::vec2> const &snakeCoords,
                   std::vector<Circle> *bodySnake);
@@ -43,6 +44,6 @@ class GLFWDisplay : public IDisplay {
 };
 
 extern "C" {
-GLFWDisplay *createDisplay(void);
+GLFWDisplay *createDisplay(int w, int h);
 void deleteDisplay(GLFWDisplay *display);
 }

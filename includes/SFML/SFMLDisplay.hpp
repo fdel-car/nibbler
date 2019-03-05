@@ -2,13 +2,12 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <glm/glm.hpp>
 
 #include "IDisplay.hpp"
 
 class SFMLDisplay : public IDisplay {
  public:
-  SFMLDisplay(void);
+  SFMLDisplay(int w, int h);
   virtual ~SFMLDisplay(void);
 
   bool windowIsOpen(void) const;
@@ -17,7 +16,6 @@ class SFMLDisplay : public IDisplay {
                    std::vector<glm::vec2> const &sndCoords);
 
  private:
-  int _width, _height;
   sf::RenderWindow _window;
   sf::Event _event;
   std::vector<sf::CircleShape> _fstBody;
@@ -25,6 +23,7 @@ class SFMLDisplay : public IDisplay {
 
   static std::map<ushort, std::string> _keyMap;
 
+  SFMLDisplay(void);
   SFMLDisplay(SFMLDisplay const &src);
 
   SFMLDisplay &operator=(SFMLDisplay const &rhs);
@@ -36,6 +35,6 @@ class SFMLDisplay : public IDisplay {
 };
 
 extern "C" {
-SFMLDisplay *createDisplay(void);
+SFMLDisplay *createDisplay(int w, int h);
 void deleteDisplay(SFMLDisplay *display);
 }

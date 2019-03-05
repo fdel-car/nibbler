@@ -6,7 +6,7 @@ CC := clang++
 OS := $(shell uname)
 CFLAGS := -Wall -Wextra -Werror -std=c++11
 DYLIBS_FLAGS := -shared -fPIC
-ignore-warnings : CFLAGS := -w
+ignore-warnings : CFLAGS := -w -std=c++11
 # LIBS :=
 HEADERS := -I./includes/ -I./libs/includes/ `pkg-config --cflags glm`
 
@@ -36,9 +36,11 @@ $(DYLIBS_DIR): $(GLFW_OBJS)
 	@$(CC) $(CFLAGS) -c ./libs/srcs/glad/glad.cpp -o $(OBJS_DIR)/glad/glad.o $(HEADERS)
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(GLFW_OBJS) $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
 	@# SFML dylib
-	@$(CC) $(CFLAGS) -c $(SRCS_DIR)/SFML/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
-	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
+	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SFML/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 	@# SDL dylib
+	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SDL/SDLDisplay.cpp -o $(OBJS_DIR)/SDL/SDLDisplay.o $(HEADERS) `pkg-config --cflags sdl2`
+	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SDL/SDLDisplay.o -o $(DYLIBS_DIR)/SDLDisplay.so `pkg-config --libs sdl2`
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
 $(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp

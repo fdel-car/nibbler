@@ -1,14 +1,15 @@
 #include "Snake.hpp"
 
-Snake::Snake(void)
-    : _dylibIdx(rand() % _dylibsPaths.size()),
-      _twoPlayers(false),
+Snake::Snake(Configs configs)
+    : _configs(configs),
+      _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
       _snakeUnit(30.f) {
   _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
   if (!_handle) _dlerrorWrapper();
 
-  _displayCreator = (IDisplay * (*)(void)) dlsym(_handle, "createDisplay");
+  _displayCreator =
+      (IDisplay * (*)(int w, int h)) dlsym(_handle, "createDisplay");
   if (!_displayCreator) _dlerrorWrapper();
 
   fstPlayer.bodyParts.push_back(glm::vec2(20 * _snakeUnit, 20 * _snakeUnit));
@@ -20,7 +21,7 @@ Snake::Snake(void)
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
 
-  if (_twoPlayers) {
+  if (_configs.twoPlayers) {
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 40 * _snakeUnit));
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 41 * _snakeUnit));
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 42 * _snakeUnit));
@@ -31,7 +32,7 @@ Snake::Snake(void)
     sndPlayer.allDirs.push_back("UP");
   }
 
-  _display = _displayCreator();
+  _display = _displayCreator(_configs.width, _configs.height);
 }
 
 Snake::~Snake(void) {
@@ -51,6 +52,7 @@ void Snake::runLoop(void) {
   size_t frameCount = 0;
 
   while (_display->windowIsOpen()) {
+    if (_newdylibIdx != _dylibIdx) break;
     _display->pollEvent(_keyMap);
     _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
 
@@ -63,7 +65,7 @@ void Snake::runLoop(void) {
     fstPlayer.speed = deltaTime * _snakeUnit * (1.f / _interval);
     if (timeElapsed >= _interval) {
       _handleInput(fstPlayer);
-      // if (_twoPlayers) _handleInput(sndPlayer);
+      if (_configs.twoPlayers) _handleInput(sndPlayer);
       timeElapsed = 0.0;
       frameCount = 0;
     }
@@ -71,6 +73,7 @@ void Snake::runLoop(void) {
     prevTime = currTime;
     frameCount++;
   }
+  // if (_newdylibIdx != _dylibIdx)
 }
 
 bool Snake::isKeyPressed(std::string key) const {
@@ -96,6 +99,9 @@ void Snake::_handleInput(Player &player) {
 
   player.allDirs.insert(player.allDirs.begin(), player.dir);
   player.allDirs.pop_back();
+  // if (isKeyPressed("1") && _dylibIdx != 1) _newdylibIdx = 1;
+  // if (isKeyPressed("2") && _dylibIdx != 2) _newdylibIdx = 2;
+  // if (isKeyPressed("3") && _dylibIdx != 3) _newdylibIdx = 3;
 }
 
 void Snake::_moveSnake(Player &player) {
@@ -154,8 +160,9 @@ void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
 std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
-  vector.push_back("./dylibs/GLFWDisplay.so");
-  vector.push_back("./dylibs/SFMLDisplay.so");
+  // vector.push_back("./dylibs/GLFWDisplay.so");
+  vector.push_back("./dylibs/SDLDisplay.so");
+  // vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;
 }
