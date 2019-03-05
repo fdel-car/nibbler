@@ -5,6 +5,8 @@ Snake::Snake(Config config)
       _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
       _snakeUnit(30.f) {
+  _newDylibIdx = _dylibIdx;
+
   _handle = dlopen(_dylibsPaths[_dylibIdx].c_str(), RTLD_LAZY);
   if (!_handle) _dlerrorWrapper();
 
