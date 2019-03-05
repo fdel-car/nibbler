@@ -1,7 +1,7 @@
 #include "Snake.hpp"
 
-Snake::Snake(Configs configs)
-    : _configs(configs),
+Snake::Snake(Config config)
+    : _config(config),
       _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
       _snakeUnit(30.f) {
@@ -21,7 +21,7 @@ Snake::Snake(Configs configs)
   fstPlayer.allDirs.push_back("UP");
   fstPlayer.allDirs.push_back("UP");
 
-  if (_configs.twoPlayers) {
+  if (_config.twoPlayers) {
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 40 * _snakeUnit));
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 41 * _snakeUnit));
     sndPlayer.bodyParts.push_back(glm::vec2(40 * _snakeUnit, 42 * _snakeUnit));
@@ -32,7 +32,7 @@ Snake::Snake(Configs configs)
     sndPlayer.allDirs.push_back("UP");
   }
 
-  _display = _displayCreator(_configs.width, _configs.height);
+  _display = _displayCreator(_config.width, _config.height);
 }
 
 Snake::~Snake(void) {
@@ -65,7 +65,7 @@ void Snake::runLoop(void) {
     fstPlayer.speed = deltaTime * _snakeUnit * (1.f / _interval);
     if (timeElapsed >= _interval) {
       _handleInput(fstPlayer);
-      if (_configs.twoPlayers) _handleInput(sndPlayer);
+      if (_config.twoPlayers) _handleInput(sndPlayer);
       timeElapsed = 0.0;
       frameCount = 0;
     }

@@ -10,7 +10,7 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
-struct Configs {
+struct Config {
   int width;
   int height;
   bool twoPlayers = false;
@@ -25,7 +25,7 @@ struct Player {
 
 class Snake {
  public:
-  Snake(Configs configs);
+  Snake(Config config);
   virtual ~Snake(void);
 
   std::chrono::high_resolution_clock::time_point currTime, prevTime;
@@ -36,7 +36,7 @@ class Snake {
   bool isKeyJustPressed(std::string key) const;
 
  private:
-  Configs _configs;
+  Config _config;
   size_t _dylibIdx;
   size_t _newdylibIdx;
   void *_handle = nullptr;
