@@ -25,7 +25,7 @@ int main(int ac, char **av) {
           else
             usage();
         }
-
+		std::cout << "Start game" << std::endl;
         Snake game(config);
         game.runLoop();
       }

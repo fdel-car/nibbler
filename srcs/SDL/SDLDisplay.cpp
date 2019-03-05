@@ -2,6 +2,7 @@
 
 SDLDisplay::SDLDisplay(int w, int h) {
   /* Initialisation simple */
+  std::cout << "SDL start" << std::endl;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     std::cerr << "Échec de l'initialisation de la SDL " << SDL_GetError()
               << std::endl;
@@ -85,7 +86,9 @@ void SDLDisplay::renderScene(std::vector<glm::vec2> const &fstCoords,
   SDL_RenderClear(_renderer);
   // _drawSnake(fstCoords);
   // if (sndCoords.size() != 0) _drawSnake(sndCoords);
-  _drawCircle(100, 100, 10);
+  SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
+
+  _drawCircle(200, 200, 10);
   SDL_RenderPresent(_renderer);
   (void)fstCoords;
   (void)sndCoords;

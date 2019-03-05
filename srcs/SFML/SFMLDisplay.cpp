@@ -2,6 +2,7 @@
 
 SFMLDisplay::SFMLDisplay(int w, int h)
     : _window(sf::VideoMode(w, h), "Nibbler - SFML", sf::Style::Close) {
+  std::cout << "SFML start" << std::endl;		
   _window.setFramerateLimit(60);
 }
 
