@@ -36,23 +36,26 @@ all: $(OBJS_DIR) $(DYLIBS_DIR) $(TARGET)
 
 ignore-warnings: all
 
-$(DYLIBS_DIR): $(GLFW_OBJS) $(SFML_OBJS) $(SDL_OBJS)
-	@mkdir -p $(DYLIBS_DIR)
-	@# GLFW dylib
-	@$(CC) $(CFLAGS) -c ./libs/srcs/glad/glad.cpp -o $(OBJS_DIR)/glad/glad.o $(HEADERS)
-	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(GLFW_OBJS) $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
-	@# SFML dylib
-	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SFML_OBJS) -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
-	@# SDL dylib
-	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SDL_OBJS) -o $(DYLIBS_DIR)/SDLDisplay.so -framework SDL2
+$(shell mkdir -p $(DYLIBS_DIR)) # Funny practice
+$(DYLIBS_DIR): $(DYLIBS_DIR)/GLFWDisplay.so $(DYLIBS_DIR)/SFMLDisplay.so $(DYLIBS_DIR)/SDLDisplay.so
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
+# GLFW dylib
+$(DYLIBS_DIR)/GLFWDisplay.so: $(GLFW_OBJS)
+	@$(CC) $(CFLAGS) -c ./libs/srcs/glad/glad.cpp -o $(OBJS_DIR)/glad/glad.o $(HEADERS)
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(GLFW_OBJS) $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
 $(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp
 	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags glfw3`
 
+# SFML dylib
+$(DYLIBS_DIR)/SFMLDisplay.so: $(SFML_OBJS)
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SFML_OBJS) -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 $(OBJS_DIR)/SFML/%.o: $(SRCS_DIR)/SFML/%.cpp
 	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
 
+# SDL dylib
+$(DYLIBS_DIR)/SDLDisplay.so: $(SDL_OBJS)
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SDL_OBJS) -o $(DYLIBS_DIR)/SDLDisplay.so -framework SDL2
 $(OBJS_DIR)/SDL/%.o: $(SRCS_DIR)/SDL/%.cpp
 	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) -F/Library/Frameworks
 
