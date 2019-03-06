@@ -43,6 +43,9 @@ int main(int ac, char **av) {
     }
     Snake game(config);
     return EXIT_SUCCESS;
+  } catch (std::bad_alloc const &err) {
+    std::cerr << "Error: Memory allocation failed." << std::endl;
+    return EXIT_FAILURE;
   } catch (std::runtime_error const &err) {
     std::cerr << "Error: " << err.what() << std::endl;
     return EXIT_FAILURE;

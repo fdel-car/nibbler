@@ -13,15 +13,16 @@ class GLFWDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(glm::ivec2 apple,
-	  				std::vector<glm::ivec2> const &fstCoords,
-                   	std::vector<glm::ivec2> const &sndCoords);
+  void renderScene(glm::ivec2 const &appleCoords,
+                   std::vector<glm::ivec2> const &fstCoords,
+                   std::vector<glm::ivec2> const &sndCoords);
 
  private:
   int _width, _height;
   GLFWwindow *_window = nullptr;
   ShaderProgram *_shaderProgram = nullptr;
   // glm::mat4 _projectionMatrix, viewMatrix;
+  Circle *_apple = nullptr;
   std::vector<Circle> _fstBody;
   std::vector<Circle> _sndBody;
 
@@ -36,6 +37,7 @@ class GLFWDisplay : public IDisplay {
   void _centerWindow(GLFWmonitor *monitor);
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                   std::vector<Circle> *bodySnake);
+  void _drawApple(glm::ivec2 const &appleCoords);
 
   static void _keyCallback(GLFWwindow *window, int key, int scancode,
                            int action, int mods);

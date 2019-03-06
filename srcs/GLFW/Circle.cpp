@@ -49,9 +49,12 @@ void Circle::setPosition(glm::ivec2 const &pos) {
   _modelMatrix[3][1] = (float)pos.y;
 }
 
+void Circle::setColor(glm::vec3 const &color) { _color = color; }
+
 void Circle::render(ShaderProgram const &shaderProgram) {
   glUseProgram(shaderProgram.getID());
   shaderProgram.setMat4("M", _modelMatrix);
+  shaderProgram.setVec3("color", _color);
   glBindVertexArray(_VAO);
   glDrawArrays(GL_TRIANGLE_FAN, 0, _vertices.size());
 }

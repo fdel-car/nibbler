@@ -12,10 +12,14 @@ GLFWDisplay::GLFWDisplay(int w, int h) {
 
   glUseProgram(_shaderProgram->getID());
   _shaderProgram->setMat4("VP", projectionMatrix * viewMatrix);
+
+  _apple = new Circle(15.f);
+  _apple->setColor(glm::vec3(1.f, 0.f, 0.f));
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
   if (_shaderProgram) delete _shaderProgram;
+  if (_apple) delete _apple;
   glfwTerminate();
 }
 
@@ -93,14 +97,21 @@ void GLFWDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void GLFWDisplay::renderScene(glm::ivec2 apple,
-							  std::vector<glm::ivec2> const &fstCoords,
+void GLFWDisplay::_drawApple(glm::ivec2 const &appleCoords) {
+  _apple->setPosition(appleCoords);
+  _apple->render(*_shaderProgram);
+}
+
+void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
+                              std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
-  (void)apple;
-  glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+  glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
+
   _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
+  _drawApple(appleCoords);
+
   glfwSwapBuffers(_window);
 }
 

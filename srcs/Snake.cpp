@@ -2,7 +2,7 @@
 
 Snake::Snake(Config config)
     : _config(config),
-	  _dylibIdx(0),
+      _dylibIdx(0),
       // _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
       _snakeUnit(30) {
@@ -58,9 +58,10 @@ void Snake::runLoop(void) {
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
     _display->pollEvent(_keyMap);
-    _display->renderScene(_apple.coord, fstPlayer.bodyParts,sndPlayer.bodyParts);
+    _display->renderScene(_apple.coord, fstPlayer.bodyParts,
+                          sndPlayer.bodyParts);
 
-	// Switch lib if asked
+    // Switch lib if asked
     if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
     if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
     if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
@@ -83,8 +84,8 @@ void Snake::runLoop(void) {
       if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
       fstPlayer.prevCrawled += toCrawl;
     }
-	
-	_prepareFood();
+
+    _prepareFood();
     prevTime = currTime;
   }
   if (_newDylibIdx != _dylibIdx) {
@@ -94,10 +95,9 @@ void Snake::runLoop(void) {
 }
 
 void Snake::_prepareFood(void) {
-	if (_apple.coord.x != -1 && _apple.coord.y != -1)
-		return ;
-	_apple.coord.x = (rand() % _config.width) * _snakeUnit;
-	_apple.coord.y = (rand() % _config.height) * _snakeUnit;
+  if (_apple.coord.x != -1 && _apple.coord.y != -1) return;
+  _apple.coord.x = (rand() % _config.width) * _snakeUnit;
+  _apple.coord.y = (rand() % _config.height) * _snakeUnit;
 }
 
 bool Snake::isKeyPressed(std::string key) const {

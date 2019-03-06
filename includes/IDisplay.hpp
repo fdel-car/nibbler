@@ -22,9 +22,9 @@ class IDisplay {
  public:
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
-  virtual void renderScene(glm::ivec2 apple,
-	  						std::vector<glm::ivec2> const &fstCoords,
-                            std::vector<glm::ivec2> const &sndCoords) = 0;
+  virtual void renderScene(glm::ivec2 const &appleCoords,
+                           std::vector<glm::ivec2> const &fstCoords,
+                           std::vector<glm::ivec2> const &sndCoords) = 0;
 
   virtual ~IDisplay(){};
 };

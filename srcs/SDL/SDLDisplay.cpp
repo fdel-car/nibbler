@@ -77,16 +77,16 @@ void SDLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords) {
   }
 }
 
-void SDLDisplay::_drawApple(glm::ivec2 apple) {
-	_drawCircle(apple.x, apple.y, 15);
+void SDLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
+  _drawCircle(appleCoords.x, appleCoords.y, 15);
 }
 
-void SDLDisplay::renderScene(glm::ivec2 apple,
-							 std::vector<glm::ivec2> const &fstCoords,
+void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
+                             std::vector<glm::ivec2> const &fstCoords,
                              std::vector<glm::ivec2> const &sndCoords) {
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
-  _drawApple(apple);
+  _drawApple(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
   _drawSnake(fstCoords);
   if (sndCoords.size() != 0) _drawSnake(sndCoords);

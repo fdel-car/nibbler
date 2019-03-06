@@ -8,6 +8,9 @@ SFMLDisplay::SFMLDisplay(int w, int h)
       sf::VideoMode::getDesktopMode().height * 0.5f -
           _window.getSize().y * 0.5f));
   _window.setFramerateLimit(60);
+
+  _apple = sf::CircleShape(15.f);
+  _apple.setFillColor(sf::Color(255, 0, 0));
 }
 
 SFMLDisplay::~SFMLDisplay(void) {}
@@ -44,19 +47,17 @@ void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void SFMLDisplay::_drawApple(glm::ivec2 apple) {
-	_apple = sf::CircleShape(15.f);
-	_apple.setPosition(apple.x, apple.y);
-	_apple.setFillColor(sf::Color(255, 0, 0));
-	_window.draw(_apple);
+void SFMLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
+  _apple.setPosition(appleCoords.x, appleCoords.y);
+  _window.draw(_apple);
 }
 
-void SFMLDisplay::renderScene(glm::ivec2 apple,
-							  std::vector<glm::ivec2> const &fstCoords,
+void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
+                              std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
   _window.clear(sf::Color::Black);
   _drawSnake(fstCoords, &_fstBody);
-  _drawApple(apple);
+  _drawApple(appleCoords);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   _window.display();
 }
