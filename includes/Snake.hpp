@@ -25,6 +25,11 @@ struct Player {
   std::vector<std::string> allDirs;
 };
 
+struct Food {
+	glm::ivec2 coord = glm::ivec2(-1, -1);
+	double lifeTime = -1.f;
+};
+
 class Snake {
  public:
   Snake(Config config);
@@ -50,6 +55,7 @@ class Snake {
   Player sndPlayer;
   float _interval;
   int const _snakeUnit;
+  Food _apple;
 
   static std::vector<std::string> _dylibsPaths;
 
@@ -61,6 +67,7 @@ class Snake {
   void _moveSnake(Player &player, int toCrawl);
   void _loadDylib(void);
   void _unloadDylib(void);
+  void _prepareFood(void);
   static std::vector<std::string> _initDylibsPaths(void);
 
   Snake &operator=(Snake const &rhs);

@@ -40,10 +40,19 @@ void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void SFMLDisplay::renderScene(std::vector<glm::ivec2> const &fstCoords,
+void SFMLDisplay::_drawApple(glm::ivec2 apple) {
+	_apple = sf::CircleShape(15.f);
+	_apple.setPosition(apple.x, apple.y);
+	_apple.setFillColor(sf::Color(255, 0, 0));
+	_window.draw(_apple);
+}
+
+void SFMLDisplay::renderScene(glm::ivec2 apple,
+							  std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
   _window.clear(sf::Color::Black);
   _drawSnake(fstCoords, &_fstBody);
+  _drawApple(apple);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   _window.display();
 }

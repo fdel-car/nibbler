@@ -17,6 +17,7 @@ static bool isNumber(const std::string &s) {
 }
 
 int main(int ac, char **av) {
+  srand(clock());
   try {
 	if (ac < 3)
 		return printError("Declare a width and height for the screen size.");

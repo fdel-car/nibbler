@@ -12,14 +12,16 @@ class SFMLDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(std::vector<glm::ivec2> const &fstCoords,
-                   std::vector<glm::ivec2> const &sndCoords);
+  void renderScene(glm::ivec2 apple,
+	  				std::vector<glm::ivec2> const &fstCoords,
+                    std::vector<glm::ivec2> const &sndCoords);
 
  private:
   sf::RenderWindow _window;
   sf::Event _event;
   std::vector<sf::CircleShape> _fstBody;
   std::vector<sf::CircleShape> _sndBody;
+  sf::CircleShape _apple;
 
   static std::map<ushort, std::string> _keyMap;
 
@@ -30,7 +32,7 @@ class SFMLDisplay : public IDisplay {
 
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                   std::vector<sf::CircleShape> *bodySnake);
-
+  void _drawApple(glm::ivec2 apple);
   static std::map<ushort, std::string> _initKeyMap(void);
 };
 

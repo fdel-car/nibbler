@@ -93,8 +93,10 @@ void GLFWDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void GLFWDisplay::renderScene(std::vector<glm::ivec2> const &fstCoords,
+void GLFWDisplay::renderScene(glm::ivec2 apple,
+							  std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
+  (void)apple;
   glClearColor(0.1f, 0.1f, 0.1f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
   _drawSnake(fstCoords, &_fstBody);
