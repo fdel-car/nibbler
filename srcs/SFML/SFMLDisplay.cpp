@@ -2,7 +2,11 @@
 
 SFMLDisplay::SFMLDisplay(int w, int h)
     : _window(sf::VideoMode(w, h), "Nibbler - SFML", sf::Style::Close) {
-  std::cout << "SFML start" << std::endl;
+  // Center window
+  _window.setPosition(sf::Vector2i(
+      sf::VideoMode::getDesktopMode().width * 0.5f - _window.getSize().x * 0.5f,
+      sf::VideoMode::getDesktopMode().height * 0.5f -
+          _window.getSize().y * 0.5f));
   _window.setFramerateLimit(60);
 }
 
