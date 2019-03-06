@@ -1,15 +1,11 @@
 #include "Snake.hpp"
 
 Snake::Snake(Config config)
-<<<<<<< HEAD
     : _config(config),
 	  _dylibIdx(0),
       // _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
       _snakeUnit(30) {
-=======
-    : _config(config), _dylibIdx(0), _interval(0.2f), _snakeUnit(30) {
->>>>>>> 0d7bbee196d0ea069bb5ea61d4d518d070eee745
   _newDylibIdx = _dylibIdx;
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
@@ -62,17 +58,12 @@ void Snake::runLoop(void) {
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
     _display->pollEvent(_keyMap);
-<<<<<<< HEAD
-    _display->renderScene(_apple.coord, fstPlayer.bodyParts, sndPlayer.bodyParts);
-=======
+    _display->renderScene(_apple.coord, fstPlayer.bodyParts,sndPlayer.bodyParts);
 
-    // Switch lib if asked
+	// Switch lib if asked
     if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
     if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
     if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
-
-    _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
->>>>>>> 0d7bbee196d0ea069bb5ea61d4d518d070eee745
 
     currTime = std::chrono::high_resolution_clock::now();
     deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(
@@ -92,6 +83,7 @@ void Snake::runLoop(void) {
       if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
       fstPlayer.prevCrawled += toCrawl;
     }
+	
 	_prepareFood();
     prevTime = currTime;
   }
