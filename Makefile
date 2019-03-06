@@ -26,25 +26,35 @@ OBJS := $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
 GLFW_SRCS := $(shell find $(SRCS_DIR)/GLFW -maxdepth 1 -name "*.cpp")
 GLFW_OBJS := $(patsubst $(SRCS_DIR)/GLFW/%.cpp,$(OBJS_DIR)/GLFW/%.o,$(GLFW_SRCS))
 
+SFML_SRCS := $(shell find $(SRCS_DIR)/SFML -maxdepth 1 -name "*.cpp")
+SFML_OBJS := $(patsubst $(SRCS_DIR)/SFML/%.cpp,$(OBJS_DIR)/SFML/%.o,$(SFML_SRCS))
+
+SDL_SRCS := $(shell find $(SRCS_DIR)/SDL -maxdepth 1 -name "*.cpp")
+SDL_OBJS := $(patsubst $(SRCS_DIR)/SDL/%.cpp,$(OBJS_DIR)/SDL/%.o,$(SDL_SRCS))
+
 all: $(OBJS_DIR) $(DYLIBS_DIR) $(TARGET)
 
 ignore-warnings: all
 
-$(DYLIBS_DIR): $(GLFW_OBJS)
+$(DYLIBS_DIR): $(GLFW_OBJS) $(SFML_OBJS) $(SDL_OBJS)
 	@mkdir -p $(DYLIBS_DIR)
 	@# GLFW dylib
 	@$(CC) $(CFLAGS) -c ./libs/srcs/glad/glad.cpp -o $(OBJS_DIR)/glad/glad.o $(HEADERS)
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(GLFW_OBJS) $(OBJS_DIR)/glad/glad.o -o $(DYLIBS_DIR)/GLFWDisplay.so `pkg-config --libs glfw3`
 	@# SFML dylib
-	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SFML/SFMLDisplay.cpp -o $(OBJS_DIR)/SFML/SFMLDisplay.o $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
-	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SFML/SFMLDisplay.o -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SFML_OBJS) -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 	@# SDL dylib
-	$(CC) $(CFLAGS) -c $(SRCS_DIR)/SDL/SDLDisplay.cpp -o $(OBJS_DIR)/SDL/SDLDisplay.o $(HEADERS) -F/Library/Frameworks 
-	$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(OBJS_DIR)/SDL/SDLDisplay.o -o $(DYLIBS_DIR)/SDLDisplay.so -framework SDL2
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SDL_OBJS) -o $(DYLIBS_DIR)/SDLDisplay.so -framework SDL2
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
 $(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp
 	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags glfw3`
+
+$(OBJS_DIR)/SFML/%.o: $(SRCS_DIR)/SFML/%.cpp
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+
+$(OBJS_DIR)/SDL/%.o: $(SRCS_DIR)/SDL/%.cpp
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) -F/Library/Frameworks
 
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
