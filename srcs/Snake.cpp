@@ -124,7 +124,7 @@ void Snake::_placeApple(void) {
 
   for (size_t i = 0; i < mapSize; i++) {
     int x = i % _config.width;
-    int y = i / _config.height;
+    int y = i / _config.width;
     bool collision = false;
     for (auto bodyPart : _fstPlayer.bodyParts)
       if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit)
@@ -139,7 +139,6 @@ void Snake::_placeApple(void) {
 
   if (!freePlaces.size())
     throw std::runtime_error("You won! I've never seen that before...");
-  _apple.coords = freePlaces[rand() % freePlaces.size()];
 }
 
 bool Snake::isKeyPressed(std::string key) const {
