@@ -10,14 +10,15 @@ Snake::Snake(Config config)
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
-  for (ushort i = 0; i < 4; i++) {
+  for (int i = 3; i >= 0; i--) {
     _fstPlayer.bodyParts.push_back(
         glm::ivec2(xPos * _snakeUnit, (yPos + i) * _snakeUnit));
-    _fstPlayer.allDirs.push_back("UP");
+    _fstPlayer.allDirs.push_back("DOWN");
   }
 
   if (_config.twoPlayers) {
-    for (ushort i = 0; i < 4; i++) {
+    _sndPlayer.dir = "UP";
+    for (int i = 0; i < 4; i++) {
       _sndPlayer.bodyParts.push_back(
           glm::ivec2(xPos * 2 * _snakeUnit, (yPos * 2 + i) * _snakeUnit));
       _sndPlayer.allDirs.push_back("UP");
@@ -61,6 +62,9 @@ void Snake::runLoop(void) {
     throw std::runtime_error(
         "The graphical interface was not initialzed correctly.");
   prevTime = std::chrono::high_resolution_clock::now();
+  bool fstAlive = true;
+  bool sndAlive = _config.twoPlayers;
+
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
 
@@ -78,8 +82,8 @@ void Snake::runLoop(void) {
     if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
     if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
 
-    _handlePlayer(_fstPlayer);
-    if (_config.twoPlayers) _handlePlayer(_sndPlayer);
+    if (fstAlive) fstAlive = _handlePlayer(_fstPlayer, _sndPlayer);
+    if (sndAlive) sndAlive = _handlePlayer(_sndPlayer, _fstPlayer);
     prevTime = currTime;
   }
   if (_newDylibIdx != _dylibIdx) {
@@ -88,7 +92,9 @@ void Snake::runLoop(void) {
   }
 }
 
-void Snake::_handlePlayer(Player &player) {
+bool Snake::_handlePlayer(Player &player, Player &opponent) {
+  if (!player.bodyParts.size() || !player.allDirs.size()) return false;
+
   player.distCrawled += deltaTime * _snakeUnit * (1.f / _interval);
   int toCrawl = (int)player.distCrawled - player.prevCrawled;
   if ((int)player.distCrawled >= _snakeUnit) {
@@ -102,6 +108,35 @@ void Snake::_handlePlayer(Player &player) {
     if (toCrawl > 0) _moveSnake(player, toCrawl);
     player.prevCrawled += toCrawl;
   }
+
+  glm::ivec2 snakeHead = player.bodyParts.front();
+
+  // Players collision
+  for (size_t i = 4; i < player.bodyParts.size(); i++) {
+    glm::ivec2 tmp = snakeHead - player.bodyParts[i];
+    float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+    if (distance < _snakeUnit / 2) return _killPlayer(player);
+  }
+  for (size_t i = 0; i < opponent.bodyParts.size(); i++) {
+    glm::ivec2 tmp = snakeHead - opponent.bodyParts[i];
+    float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+    if (distance < _snakeUnit / 2) {
+      if (i == 0) _killPlayer(opponent);
+      return _killPlayer(player);
+    }
+  }
+
+  // Walls collision
+  if (snakeHead.x < 0 || snakeHead.x > (_config.width - 1) * _snakeUnit ||
+      snakeHead.y < 0 || snakeHead.y > (_config.height - 1) * _snakeUnit)
+    return _killPlayer(player);
+  return true;
+}
+
+bool Snake::_killPlayer(Player &player) {
+  player.bodyParts.clear();
+  player.allDirs.clear();
+  return true;
 }
 
 void Snake::_foodHandler(Player &player) {

@@ -105,11 +105,11 @@ void GLFWDisplay::_drawApple(glm::ivec2 const &appleCoords) {
 void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
                               std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
-  glClearColor(0.f, 0.f, 0.f, 1.f);
+  glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   _drawApple(appleCoords);
-  _drawSnake(fstCoords, &_fstBody);
+  if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
 
   glfwSwapBuffers(_window);

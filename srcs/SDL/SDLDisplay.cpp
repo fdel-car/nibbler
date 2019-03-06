@@ -88,9 +88,9 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawApple(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
-  _drawSnake(fstCoords);
+  if (fstCoords.size() != 0) _drawSnake(fstCoords);
   if (sndCoords.size() != 0) _drawSnake(sndCoords);
-  SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
+  SDL_SetRenderDrawColor(_renderer, 51, 51, 51, 255);
   SDL_RenderPresent(_renderer);
 }
 

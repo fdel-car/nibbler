@@ -24,7 +24,7 @@ struct Keys {
 };
 
 struct Player {
-  std::string dir = "UP";
+  std::string dir = "DOWN";
   float speed = 1.f;
   float distCrawled = 0.f;
   int prevCrawled = 0;
@@ -80,7 +80,8 @@ class Snake {
   void _unloadDylib(void);
   void _foodHandler(Player &player);
   void _placeApple(void);
-  void _handlePlayer(Player &player);
+  bool _handlePlayer(Player &player, Player &opponent);
+  bool _killPlayer(Player &player);
 
   static std::vector<std::string> _initDylibsPaths(void);
 

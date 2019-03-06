@@ -55,9 +55,9 @@ void SFMLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
 void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
                               std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
-  _window.clear(sf::Color::Black);
+  _window.clear(sf::Color(51, 51, 51, 255));
   _drawApple(appleCoords);
-  _drawSnake(fstCoords, &_fstBody);
+  if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   _window.display();
 }
