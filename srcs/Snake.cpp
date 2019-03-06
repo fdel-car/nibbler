@@ -74,6 +74,12 @@ void Snake::runLoop(void) {
     fstPlayer.distCrawled += deltaTime * _snakeUnit * (1.f / _interval);
     int toCrawl = (int)fstPlayer.distCrawled - fstPlayer.prevCrawled;
     if ((int)fstPlayer.distCrawled >= _snakeUnit) {
+	  if (fstPlayer.newBodyPart.x != -1 && fstPlayer.newBodyPart.y != -1) {
+		fstPlayer.bodyParts.push_back(fstPlayer.newBodyPart);
+	  	fstPlayer.allDirs.push_back(fstPlayer.newDir);
+		fstPlayer.newBodyPart = glm::ivec2(-1, -1);
+		fstPlayer.newDir = "";
+	  }
       fstPlayer.distCrawled = fmod(fstPlayer.distCrawled, (float)_snakeUnit);
       toCrawl -= (int)fstPlayer.distCrawled;
       fstPlayer.prevCrawled = 0;
@@ -83,8 +89,7 @@ void Snake::runLoop(void) {
       if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
       fstPlayer.prevCrawled += toCrawl;
     }
-	
-	_prepareFood();
+	_foodHandler();
     prevTime = currTime;
   }
   if (_newDylibIdx != _dylibIdx) {
@@ -93,7 +98,16 @@ void Snake::runLoop(void) {
   }
 }
 
-void Snake::_prepareFood(void) {
+void Snake::_foodHandler(void) {
+	if (fstPlayer.bodyParts.front() == _apple.coord) {
+		_apple.coord = glm::ivec2(-1, -1);
+		fstPlayer.newBodyPart = fstPlayer.bodyParts.back();
+		fstPlayer.newDir = fstPlayer.allDirs.back();
+	}
+	// if (_config.twoPlayers && sndPlayer.bodyParts.front() == _apple.coord) {
+	// 	_apple.coord = glm::ivec2(-1, -1);
+	// 	sndPlayer.bodyParts.push_back(sndPlayer.bodyParts.back());
+	// }
 	if (_apple.coord.x != -1 && _apple.coord.y != -1)
 		return ;
 	_apple.coord.x = (rand() % _config.width) * _snakeUnit;

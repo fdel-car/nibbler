@@ -23,6 +23,8 @@ struct Player {
   int prevCrawled = 0;
   std::vector<glm::ivec2> bodyParts;
   std::vector<std::string> allDirs;
+  glm::ivec2 newBodyPart = glm::ivec2(-1, -1);
+  std::string newDir = "";
 };
 
 struct Food {
@@ -67,7 +69,7 @@ class Snake {
   void _moveSnake(Player &player, int toCrawl);
   void _loadDylib(void);
   void _unloadDylib(void);
-  void _prepareFood(void);
+  void _foodHandler(void);
   static std::vector<std::string> _initDylibsPaths(void);
 
   Snake &operator=(Snake const &rhs);
