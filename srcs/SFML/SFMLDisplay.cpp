@@ -56,8 +56,8 @@ void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
                               std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
   _window.clear(sf::Color::Black);
-  _drawSnake(fstCoords, &_fstBody);
   _drawApple(appleCoords);
+  _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   _window.display();
 }
@@ -70,6 +70,10 @@ std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
   keyMap[sf::Keyboard::A] = "A";
   keyMap[sf::Keyboard::S] = "S";
   keyMap[sf::Keyboard::D] = "D";
+  keyMap[sf::Keyboard::Up] = "UP";
+  keyMap[sf::Keyboard::Left] = "LEFT";
+  keyMap[sf::Keyboard::Down] = "DOWN";
+  keyMap[sf::Keyboard::Right] = "RIGHT";
   keyMap[sf::Keyboard::Num1] = "1";
   keyMap[sf::Keyboard::Num2] = "2";
   keyMap[sf::Keyboard::Num3] = "3";

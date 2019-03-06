@@ -97,14 +97,18 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
 std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {
   std::map<ushort, std::string> keyMap;
 
-  keyMap[SDLK_ESCAPE] = "ESC";
-  keyMap[SDLK_w] = "W";
-  keyMap[SDLK_a] = "A";
-  keyMap[SDLK_s] = "S";
-  keyMap[SDLK_d] = "D";
-  keyMap[SDLK_1] = "1";
-  keyMap[SDLK_2] = "2";
-  keyMap[SDLK_3] = "3";
+  keyMap[SDL_SCANCODE_ESCAPE] = "ESC";
+  keyMap[SDL_SCANCODE_W] = "W";
+  keyMap[SDL_SCANCODE_A] = "A";
+  keyMap[SDL_SCANCODE_S] = "S";
+  keyMap[SDL_SCANCODE_D] = "D";
+  keyMap[SDL_SCANCODE_UP] = "UP";
+  keyMap[SDL_SCANCODE_LEFT] = "LEFT";
+  keyMap[SDL_SCANCODE_DOWN] = "DOWN";
+  keyMap[SDL_SCANCODE_RIGHT] = "RIGHT";
+  keyMap[SDL_SCANCODE_1] = "1";
+  keyMap[SDL_SCANCODE_2] = "2";
+  keyMap[SDL_SCANCODE_3] = "3";
 
   return keyMap;
 }

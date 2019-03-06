@@ -108,9 +108,9 @@ void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
   glClearColor(0.f, 0.f, 0.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  _drawApple(appleCoords);
   _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
-  _drawApple(appleCoords);
 
   glfwSwapBuffers(_window);
 }
@@ -142,6 +142,10 @@ std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
   keyMap[GLFW_KEY_A] = "A";
   keyMap[GLFW_KEY_S] = "S";
   keyMap[GLFW_KEY_D] = "D";
+  keyMap[GLFW_KEY_UP] = "UP";
+  keyMap[GLFW_KEY_LEFT] = "LEFT";
+  keyMap[GLFW_KEY_DOWN] = "DOWN";
+  keyMap[GLFW_KEY_RIGHT] = "RIGHT";
   keyMap[GLFW_KEY_1] = "1";
   keyMap[GLFW_KEY_2] = "2";
   keyMap[GLFW_KEY_3] = "3";

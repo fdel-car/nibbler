@@ -16,6 +16,13 @@ struct Config {
   bool twoPlayers = false;
 };
 
+struct Keys {
+  std::string up = "W";
+  std::string left = "A";
+  std::string down = "S";
+  std::string right = "D";
+};
+
 struct Player {
   std::string dir = "UP";
   float speed = 1.f;
@@ -23,11 +30,15 @@ struct Player {
   int prevCrawled = 0;
   std::vector<glm::ivec2> bodyParts;
   std::vector<std::string> allDirs;
+  glm::ivec2 newBodyPart;
+  std::string newDir;
+  bool hasEaten = false;
+  Keys keys;
 };
 
 struct Food {
-	glm::ivec2 coord = glm::ivec2(-1, -1);
-	double lifeTime = -1.f;
+  glm::ivec2 coords;
+  double lifeTime = -1.f;
 };
 
 class Snake {
@@ -51,8 +62,8 @@ class Snake {
   void (*_displayDestructor)(IDisplay *);
   IDisplay *_display = nullptr;
   std::map<std::string, KeyState> _keyMap;
-  Player fstPlayer;
-  Player sndPlayer;
+  Player _fstPlayer;
+  Player _sndPlayer;
   float _interval;
   int const _snakeUnit;
   Food _apple;
@@ -67,7 +78,10 @@ class Snake {
   void _moveSnake(Player &player, int toCrawl);
   void _loadDylib(void);
   void _unloadDylib(void);
-  void _prepareFood(void);
+  void _foodHandler(Player &player);
+  void _placeApple(void);
+  void _handlePlayer(Player &player);
+
   static std::vector<std::string> _initDylibsPaths(void);
 
   Snake &operator=(Snake const &rhs);
