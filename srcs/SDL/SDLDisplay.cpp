@@ -1,27 +1,21 @@
 #include "SDL/SDLDisplay.hpp"
 
 SDLDisplay::SDLDisplay(int w, int h) {
-  /* Initialisation simple */
-  std::cout << "SDL start" << std::endl;
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    std::cerr << "Échec de l'initialisation de la SDL " << SDL_GetError()
-              << std::endl;
-    return;
-  }
+  if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    throw std::runtime_error(std::string("Failed to initialize the SDL, ") +
+                             SDL_GetError());
 
   _window = SDL_CreateWindow("Nibbler - SDL", SDL_WINDOWPOS_CENTERED,
                              SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
-  if (!_window) {
-    std::cerr << "Erreur de création de la fenêtre: " << SDL_GetError()
-              << std::endl;
-    return;
-  }
+  if (!_window)
+    throw std::runtime_error(std::string("Failed to create the SDL window, ") +
+                             SDL_GetError());
+
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
-  if (!_renderer) {
-    std::cerr << "Erreur de création du renderer: " << SDL_GetError()
-              << std::endl;
-    return;
-  }
+  if (!_renderer)
+    throw std::runtime_error(
+        std::string("Failed to initialize the SDL renderer, ") +
+        SDL_GetError());
 }
 
 SDLDisplay::~SDLDisplay(void) {
@@ -52,18 +46,18 @@ void SDLDisplay::_drawCircle(int _x, int _y, int radius) {
   int y = 0;
   int tx = 1;
   int ty = 1;
-  int err = tx - (radius << 1);  // shifting bits left by 1 effectively
+  int err = tx - (radius << 1);  // Shifting bits left by 1 effectively
                                  // doubles the value. == tx - diameter
   while (x >= y) {
     //  Each of the following renders an octant of the circle
-    SDL_RenderDrawPoint(_renderer, _x + x, _y - y);
-    SDL_RenderDrawPoint(_renderer, _x + x, _y + y);
-    SDL_RenderDrawPoint(_renderer, _x - x, _y - y);
-    SDL_RenderDrawPoint(_renderer, _x - x, _y + y);
-    SDL_RenderDrawPoint(_renderer, _x + y, _y - x);
-    SDL_RenderDrawPoint(_renderer, _x + y, _y + x);
-    SDL_RenderDrawPoint(_renderer, _x - y, _y - x);
-    SDL_RenderDrawPoint(_renderer, _x - y, _y + x);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) + x, (_y + radius) - y);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) + x, (_y + radius) + y);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) - x, (_y + radius) - y);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) - x, (_y + radius) + y);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) + y, (_y + radius) - x);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) + y, (_y + radius) + x);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) - y, (_y + radius) - x);
+    SDL_RenderDrawPoint(_renderer, (_x + radius) - y, (_y + radius) + x);
     if (err <= 0) {
       y++;
       err += ty;

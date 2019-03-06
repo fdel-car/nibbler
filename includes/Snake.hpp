@@ -57,7 +57,7 @@ class Snake {
   Snake(Snake const &src);
 
   void _dlerrorWrapper(void);
-  void _handleInput(Player &player);
+  void _handleMoveInput(Player &player);
   void _moveSnake(Player &player, int toCrawl);
   void _loadDylib(void);
   void _unloadDylib(void);

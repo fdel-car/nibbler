@@ -33,7 +33,7 @@ void GLFWDisplay::_initContext(int w, int h) {
   _window = glfwCreateWindow(w, h, "Nibbler - GLFW", nullptr, nullptr);
   if (!_window) {
     glfwTerminate();
-    throw std::runtime_error("Failed to create windows GLFW");
+    throw std::runtime_error("Failed to create the GLFW window");
   }
 
   // Discreetly center window
@@ -49,7 +49,7 @@ void GLFWDisplay::_initContext(int w, int h) {
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     throw std::runtime_error("Failed to initialize GLAD");
-  printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+  // printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
   glViewport(0, 0, _width, _height);
 }
 

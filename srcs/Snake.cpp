@@ -1,10 +1,7 @@
 #include "Snake.hpp"
 
 Snake::Snake(Config config)
-    : _config(config),
-      _dylibIdx(0),
-      _interval(0.2f),
-      _snakeUnit(30) {
+    : _config(config), _dylibIdx(0), _interval(0.2f), _snakeUnit(30) {
   _newDylibIdx = _dylibIdx;
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
@@ -57,6 +54,12 @@ void Snake::runLoop(void) {
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
     _display->pollEvent(_keyMap);
+
+    // Switch lib if asked
+    if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
+    if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
+    if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
+
     _display->renderScene(fstPlayer.bodyParts, sndPlayer.bodyParts);
 
     currTime = std::chrono::high_resolution_clock::now();
@@ -72,7 +75,7 @@ void Snake::runLoop(void) {
       toCrawl -= (int)fstPlayer.distCrawled;
       fstPlayer.prevCrawled = 0;
       if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
-      _handleInput(fstPlayer);
+      _handleMoveInput(fstPlayer);
     } else {
       if (toCrawl > 0) _moveSnake(fstPlayer, toCrawl);
       fstPlayer.prevCrawled += toCrawl;
@@ -97,7 +100,7 @@ bool Snake::isKeyJustPressed(std::string key) const {
          !result->second.prevFrame;
 }
 
-void Snake::_handleInput(Player &player) {
+void Snake::_handleMoveInput(Player &player) {
   if (isKeyPressed("W") && player.dir != "DOWN")
     player.dir = "UP";
   else if (isKeyPressed("A") && player.dir != "RIGHT")
@@ -106,63 +109,24 @@ void Snake::_handleInput(Player &player) {
     player.dir = "DOWN";
   else if (isKeyPressed("D") && player.dir != "LEFT")
     player.dir = "RIGHT";
-
   player.allDirs.insert(player.allDirs.begin(), player.dir);
   player.allDirs.pop_back();
-  if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
-  if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
-  if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
 }
 
 void Snake::_moveSnake(Player &player, int toCrawl) {
-  if (player.dir == "LEFT") player.bodyParts.front().x -= toCrawl;
-  if (player.dir == "RIGHT") player.bodyParts.front().x += toCrawl;
-  if (player.dir == "UP") player.bodyParts.front().y -= toCrawl;
-  if (player.dir == "DOWN") player.bodyParts.front().y += toCrawl;
+  for (size_t idx = 0; idx < player.bodyParts.size(); idx++) {
+    glm::ivec2 &pos = player.bodyParts[idx];
+    std::string dir = player.allDirs[idx];
 
-  // glm::ivec2 prevPos = player.bodyParts.front();
-  // for (size_t idx = 1; idx < player.bodyParts.size(); idx++) {
-  //   glm::ivec2 &pos = player.bodyParts[idx];
-  //   std::string currDir = player.allDirs[idx];
-  //   std::string prevDir = player.allDirs[idx - 1];
-
-  //   if (currDir == "UP") {
-  //     if (prevPos.y <= pos.y - player.speed)
-  //       pos.y -= player.speed;
-  //     else {
-  //       pos.y = prevPos.y;
-  //       pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
-  //     }
-  //   } else if (currDir == "DOWN") {
-  //     if (prevPos.y >= pos.y + player.speed)
-  //       pos.y += player.speed;
-  //     else {
-  //       pos.y = prevPos.y;
-  //       pos.x = prevPos.x + (prevDir == "LEFT" ? _snakeUnit : -_snakeUnit);
-  //     }
-  //   } else if (currDir == "LEFT") {
-  //     if (prevPos.x <= pos.x - player.speed)
-  //       pos.x -= player.speed;
-  //     else {
-  //       pos.x = prevPos.x;
-  //       pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
-  //     }
-  //   } else if (currDir == "RIGHT") {
-  //     if (prevPos.x >= pos.x + player.speed)
-  //       pos.x += player.speed;
-  //     else {
-  //       pos.x = prevPos.x;
-  //       pos.y = prevPos.y + (prevDir == "UP" ? _snakeUnit : -_snakeUnit);
-  //     }
-  //   }
-  //   prevPos = pos;
-  // }
-
-  // // Debug
-  // for (auto dir : player.allDirs) {
-  //   std::cout << dir << std::endl;
-  // }
-  // std::cout << std::endl;
+    if (dir == "UP")
+      pos.y -= toCrawl;
+    else if (dir == "DOWN")
+      pos.y += toCrawl;
+    else if (dir == "LEFT")
+      pos.x -= toCrawl;
+    else if (dir == "RIGHT")
+      pos.x += toCrawl;
+  }
 }
 
 void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
