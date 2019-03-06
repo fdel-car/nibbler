@@ -2,7 +2,7 @@
 
 Snake::Snake(Config config)
     : _config(config),
-      _dylibIdx(rand() % _dylibsPaths.size()),
+      _dylibIdx(0),
       _interval(0.2f),
       _snakeUnit(30) {
   _newDylibIdx = _dylibIdx;
@@ -170,9 +170,9 @@ void Snake::_dlerrorWrapper(void) { throw std::runtime_error(dlerror()); }
 std::vector<std::string> Snake::_initDylibsPaths(void) {
   std::vector<std::string> vector;
 
+  vector.push_back("./dylibs/SFMLDisplay.so");
   vector.push_back("./dylibs/GLFWDisplay.so");
   vector.push_back("./dylibs/SDLDisplay.so");
-  vector.push_back("./dylibs/SFMLDisplay.so");
 
   return vector;
 }
