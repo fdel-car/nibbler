@@ -3,8 +3,6 @@
 #include <dlfcn.h>
 #include <algorithm>
 #include <ctime>
-#include <unordered_map>
-#include <vector>
 #include "IDisplay.hpp"
 
 #define WIDTH 1280
@@ -24,14 +22,13 @@ struct Keys {
 };
 
 struct Player {
-  std::string dir = "DOWN";
   float speed = 1.f;
   float distCrawled = 0.f;
   int prevCrawled = 0;
-  std::vector<glm::ivec2> bodyParts;
-  std::vector<std::string> allDirs;
+  SharedData data;
+  std::vector<int> allDirs;
   glm::ivec2 newBodyPart;
-  std::string newDir;
+  int newDirAngle;
   bool hasEaten = false;
   Keys keys;
 };

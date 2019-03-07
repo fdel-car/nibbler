@@ -13,11 +13,13 @@ GLFWDisplay::GLFWDisplay(int w, int h) {
   glUseProgram(_shaderProgram->getID());
   _shaderProgram->setMat4("VP", projectionMatrix * viewMatrix);
 
-  _apple = new Circle(15.f);
+  _apple = new Circle(__GAME_LENGTH_UNIT__ / 2.f);
   _apple->setColor(glm::vec3(1.f, 0.f, 0.f));
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
+  _fstBody.clear();
+  _sndBody.clear();
   if (_shaderProgram) delete _shaderProgram;
   if (_apple) delete _apple;
   glfwTerminate();
@@ -85,16 +87,18 @@ void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
   _keyReleased.clear();
 }
 
-void GLFWDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
-                             std::vector<Circle> *bodySnake) {
-  size_t bodySize = bodySnake->size();
-  for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
-    bodySnake->emplace_back(15.f);
+void GLFWDisplay::_drawSnake(SharedData const &data,
+                             std::vector<Circle> &bodySnake) {
+  size_t bodySize = bodySnake.size();
+  for (size_t i = 0; i < data.bodyParts.size() - bodySize; i++) {
+    bodySnake.emplace_back(__GAME_LENGTH_UNIT__ / 2.f);
+    bodySnake[i + bodySize].setColor(glm::vec3(0.4f, 0.5f, 0.3f));
   }
-  for (size_t i = 0; i < snakeCoords.size(); i++) {
-    bodySnake->at(i).setPosition(snakeCoords.at(i));
-    bodySnake->at(i).render(*_shaderProgram);
+  for (size_t i = 0; i < data.bodyParts.size(); i++) {
+    bodySnake[i].setPosition(data.bodyParts[i]);
+    bodySnake[i].render(*_shaderProgram);
   }
+  _drawEyes(bodySnake.front(), data.dirAngle);
 }
 
 void GLFWDisplay::_drawApple(glm::ivec2 const &appleCoords) {
@@ -102,15 +106,51 @@ void GLFWDisplay::_drawApple(glm::ivec2 const &appleCoords) {
   _apple->render(*_shaderProgram);
 }
 
+// Should be initialized before, so that we don't create a new Circle on the
+// stack each frame
+void GLFWDisplay::_drawEyes(Circle const &snakeHead, int const dirAngle) {
+  Circle eyeL(
+      __GAME_LENGTH_UNIT__ / 5.f,
+      glm::vec2(-__GAME_LENGTH_UNIT__ / 6.f, -__GAME_LENGTH_UNIT__ / 7.f));
+  eyeL.rotate(dirAngle);
+  eyeL.setPosition(snakeHead.getPosition() + glm::ivec2(snakeHead.getRadius()));
+  eyeL.render(*_shaderProgram);
+
+  Circle eyeR(
+      __GAME_LENGTH_UNIT__ / 5.f,
+      glm::vec2(__GAME_LENGTH_UNIT__ / 6.f, -__GAME_LENGTH_UNIT__ / 7.f));
+  eyeR.rotate(dirAngle);
+  eyeR.setPosition(snakeHead.getPosition() + glm::ivec2(snakeHead.getRadius()));
+  eyeR.render(*_shaderProgram);
+
+  Circle irisL(
+      __GAME_LENGTH_UNIT__ / 12.f,
+      glm::vec2(-__GAME_LENGTH_UNIT__ / 6.f, -__GAME_LENGTH_UNIT__ / 4.f));
+  irisL.rotate(dirAngle);
+  irisL.setPosition(snakeHead.getPosition() +
+                    glm::ivec2(snakeHead.getRadius()));
+  irisL.setColor(glm::vec3(0.f));
+  irisL.render(*_shaderProgram);
+
+  Circle irisR(
+      __GAME_LENGTH_UNIT__ / 12.f,
+      glm::vec2(__GAME_LENGTH_UNIT__ / 6.f, -__GAME_LENGTH_UNIT__ / 4.f));
+  irisR.rotate(dirAngle);
+  irisR.setPosition(snakeHead.getPosition() +
+                    glm::ivec2(snakeHead.getRadius()));
+  irisR.setColor(glm::vec3(0.f));
+  irisR.render(*_shaderProgram);
+}
+
 void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
-                              std::vector<glm::ivec2> const &fstCoords,
-                              std::vector<glm::ivec2> const &sndCoords) {
+                              SharedData const &fstData,
+                              SharedData const &sndData) {
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   _drawApple(appleCoords);
-  if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
-  if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
+  if (fstData.bodyParts.size() != 0) _drawSnake(fstData, _fstBody);
+  if (sndData.bodyParts.size() != 0) _drawSnake(sndData, _sndBody);
 
   glfwSwapBuffers(_window);
 }

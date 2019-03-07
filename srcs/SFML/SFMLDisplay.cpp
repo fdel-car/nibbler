@@ -9,7 +9,7 @@ SFMLDisplay::SFMLDisplay(int w, int h)
           _window.getSize().y * 0.5f));
   _window.setFramerateLimit(60);
 
-  _apple = sf::CircleShape(15.f);
+  _apple = sf::CircleShape(__GAME_LENGTH_UNIT__ / 2.f);
   _apple.setFillColor(sf::Color(255, 0, 0));
 }
 
@@ -39,7 +39,7 @@ void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                              std::vector<sf::CircleShape> *bodySnake) {
   size_t bodySize = bodySnake->size();
   for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
-    bodySnake->push_back(sf::CircleShape(15.f));
+    bodySnake->push_back(sf::CircleShape(__GAME_LENGTH_UNIT__ / 2.f));
   }
   for (size_t i = 0; i < snakeCoords.size(); i++) {
     bodySnake->at(i).setPosition(snakeCoords.at(i).x, snakeCoords.at(i).y);
@@ -53,12 +53,12 @@ void SFMLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
 }
 
 void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
-                              std::vector<glm::ivec2> const &fstCoords,
-                              std::vector<glm::ivec2> const &sndCoords) {
+                              SharedData const &fstData,
+                              SharedData const &sndData) {
   _window.clear(sf::Color(51, 51, 51, 255));
   _drawApple(appleCoords);
-  if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
-  if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
+  if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, &_fstBody);
+  if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts, &_sndBody);
   _window.display();
 }
 
