@@ -5,23 +5,23 @@ Snake::Snake(Config config)
       _dylibIdx(0),
       // _dylibIdx(rand() % _dylibsPaths.size()),
       _interval(0.2f),
-      _snakeUnit(30) {
+      _snakeUnit(__GAME_LENGTH_UNIT__) {
   _newDylibIdx = _dylibIdx;
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
   for (int i = 3; i >= 0; i--) {
-    _fstPlayer.bodyParts.push_back(
+    _fstPlayer.data.bodyParts.push_back(
         glm::ivec2(xPos * _snakeUnit, (yPos + i) * _snakeUnit));
-    _fstPlayer.allDirs.push_back("DOWN");
+    _fstPlayer.allDirs.push_back(180);
   }
 
   if (_config.twoPlayers) {
-    _sndPlayer.dir = "UP";
+    _sndPlayer.data.dirAngle = 0;
     for (int i = 0; i < 4; i++) {
-      _sndPlayer.bodyParts.push_back(
+      _sndPlayer.data.bodyParts.push_back(
           glm::ivec2(xPos * 2 * _snakeUnit, (yPos * 2 + i) * _snakeUnit));
-      _sndPlayer.allDirs.push_back("UP");
+      _sndPlayer.allDirs.push_back(0);
     }
     _sndPlayer.keys.up = "UP";
     _sndPlayer.keys.left = "LEFT";
@@ -90,8 +90,8 @@ void Snake::runLoop(void) {
                     .count();
 
     _display->pollEvent(_keyMap);
-    _display->renderScene(_apple.coords, _bonusFood.coords, _fstPlayer.bodyParts,
-                          _sndPlayer.bodyParts);
+    _display->renderScene(_apple.coords, _bonusFood.coords, _fstPlayer.data,
+                          _sndPlayer.data);
 
     // Switch lib if asked
     if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
@@ -109,7 +109,7 @@ void Snake::runLoop(void) {
 }
 
 bool Snake::_handlePlayer(Player &player, Player &opponent) {
-  if (!player.bodyParts.size() || !player.allDirs.size()) return false;
+  if (!player.data.bodyParts.size() || !player.allDirs.size()) return false;
 
   player.distCrawled += deltaTime * _snakeUnit * (1.f / _interval);
   int toCrawl = (int)player.distCrawled - player.prevCrawled;
@@ -126,16 +126,16 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
     player.prevCrawled += toCrawl;
   }
 
-  glm::ivec2 snakeHead = player.bodyParts.front();
+  glm::ivec2 snakeHead = player.data.bodyParts.front();
 
   // Players collision
-  for (size_t i = 4; i < player.bodyParts.size(); i++) {
-    glm::ivec2 tmp = snakeHead - player.bodyParts[i];
+  for (size_t i = 4; i < player.data.bodyParts.size(); i++) {
+    glm::ivec2 tmp = snakeHead - player.data.bodyParts[i];
     float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
     if (distance < _snakeUnit / 2) return _killPlayer(player);
   }
-  for (size_t i = 0; i < opponent.bodyParts.size(); i++) {
-    glm::ivec2 tmp = snakeHead - opponent.bodyParts[i];
+  for (size_t i = 0; i < opponent.data.bodyParts.size(); i++) {
+    glm::ivec2 tmp = snakeHead - opponent.data.bodyParts[i];
     float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
     if (distance < _snakeUnit / 2) {
       if (i == 0) _killPlayer(opponent);
@@ -164,24 +164,24 @@ void Snake::_dropBonusFood(void) {
 }
 
 bool Snake::_killPlayer(Player &player) {
-  player.bodyParts.clear();
+  player.data.bodyParts.clear();
   player.allDirs.clear();
   return true;
 }
 
 void Snake::_foodHandler(Player &player) {
   if (player.hasEaten) {
-    player.bodyParts.push_back(player.newBodyPart);
-    player.allDirs.push_back(player.newDir);
+    player.data.bodyParts.push_back(player.newBodyPart);
+    player.allDirs.push_back(player.newDirAngle);
     player.hasEaten = false;
   }
-  if (player.bodyParts.front() == _apple.coords) {
-    player.newBodyPart = player.bodyParts.back();
-    player.newDir = player.allDirs.back();
+  if (player.data.bodyParts.front() == _apple.coords) {
+    player.newBodyPart = player.data.bodyParts.back();
+    player.newDirAngle = player.allDirs.back();
     _placeFood(_apple);
     player.hasEaten = true;
   }
-  if (player.bodyParts.front() == _bonusFood.coords) {
+  if (player.data.bodyParts.front() == _bonusFood.coords) {
 	_bonusFood.coords.x = _config.width * _snakeUnit;
 	_bonusFood.lifeTime = -1;
   }
@@ -196,11 +196,11 @@ void Snake::_placeFood(Food &food) {
     int y = i / _config.width;
 
     bool collision = false;
-    for (auto bodyPart : _fstPlayer.bodyParts)
+    for (auto bodyPart : _fstPlayer.data.bodyParts)
       if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit)
         collision = true;
     if (collision) continue;
-    for (auto bodyPart : _sndPlayer.bodyParts)
+    for (auto bodyPart : _sndPlayer.data.bodyParts)
       if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit)
         collision = true;
     if (collision) continue;
@@ -224,30 +224,30 @@ bool Snake::isKeyJustPressed(std::string key) const {
 }
 
 void Snake::_handleMoveInput(Player &player) {
-  if (isKeyPressed(player.keys.up) && player.dir != "DOWN")
-    player.dir = "UP";
-  else if (isKeyPressed(player.keys.left) && player.dir != "RIGHT")
-    player.dir = "LEFT";
-  else if (isKeyPressed(player.keys.down) && player.dir != "UP")
-    player.dir = "DOWN";
-  else if (isKeyPressed(player.keys.right) && player.dir != "LEFT")
-    player.dir = "RIGHT";
-  player.allDirs.insert(player.allDirs.begin(), player.dir);
+  if (isKeyPressed(player.keys.up) && player.data.dirAngle != 180)
+    player.data.dirAngle = 0;
+  else if (isKeyPressed(player.keys.left) && player.data.dirAngle != 90)
+    player.data.dirAngle = 270;
+  else if (isKeyPressed(player.keys.down) && player.data.dirAngle != 0)
+    player.data.dirAngle = 180;
+  else if (isKeyPressed(player.keys.right) && player.data.dirAngle != 270)
+    player.data.dirAngle = 90;
+  player.allDirs.insert(player.allDirs.begin(), player.data.dirAngle);
   player.allDirs.pop_back();
 }
 
 void Snake::_moveSnake(Player &player, int toCrawl) {
-  for (size_t idx = 0; idx < player.bodyParts.size(); idx++) {
-    glm::ivec2 &pos = player.bodyParts[idx];
-    std::string dir = player.allDirs[idx];
+  for (size_t idx = 0; idx < player.data.bodyParts.size(); idx++) {
+    glm::ivec2 &pos = player.data.bodyParts[idx];
+    int dirAngle = player.allDirs[idx];
 
-    if (dir == "UP")
+    if (dirAngle == 0)
       pos.y -= toCrawl;
-    else if (dir == "DOWN")
+    else if (dirAngle == 180)
       pos.y += toCrawl;
-    else if (dir == "LEFT")
+    else if (dirAngle == 270)
       pos.x -= toCrawl;
-    else if (dir == "RIGHT")
+    else if (dirAngle == 90)
       pos.x += toCrawl;
   }
 }

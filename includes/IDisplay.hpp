@@ -1,8 +1,10 @@
 #pragma once
 
+#define __GAME_LENGTH_UNIT__ 40
+
 #include <iostream>
 #include <map>
-#include <unordered_map>
+#include <vector>
 
 // GLM (math library)
 #include <glm/glm.hpp>
@@ -15,14 +17,19 @@ struct KeyState {
   bool prevFrame;
 };
 
+struct SharedData {
+  int dirAngle = 180;
+  std::vector<glm::ivec2> bodyParts;
+};
+
 class IDisplay {
  public:
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
   virtual void renderScene(glm::ivec2 const &appleCoords,
-	  					   glm::ivec2 const &bonusFoodCoords,
-                           std::vector<glm::ivec2> const &fstCoords,
-                           std::vector<glm::ivec2> const &sndCoords) = 0;
+	  						glm::ivec2 const &bonusFoodCoords,
+                           SharedData const &fstData,
+                           SharedData const &sndData) = 0;
 
   virtual ~IDisplay(){};
 };

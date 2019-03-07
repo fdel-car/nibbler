@@ -73,26 +73,27 @@ void SDLDisplay::_drawCircle(int _x, int _y, int radius) {
 
 void SDLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords) {
   for (size_t i = 0; i < snakeCoords.size(); i++) {
-    _drawCircle(snakeCoords.at(i).x, snakeCoords.at(i).y, 15);
+    _drawCircle(snakeCoords.at(i).x, snakeCoords.at(i).y,
+                __GAME_LENGTH_UNIT__ / 2.f);
   }
 }
 
 void SDLDisplay::_drawFood(glm::ivec2 const &appleCoords) {
-  _drawCircle(appleCoords.x, appleCoords.y, 15);
+  _drawCircle(appleCoords.x, appleCoords.y, __GAME_LENGTH_UNIT__ / 2.f);
 }
 
 void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
 							 glm::ivec2 const &bonusFoodCoords,
-                             std::vector<glm::ivec2> const &fstCoords,
-                             std::vector<glm::ivec2> const &sndCoords) {
+							 SharedData const &fstData,
+                             SharedData const &sndData) {
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawFood(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);
   _drawFood(bonusFoodCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
-  if (fstCoords.size() != 0) _drawSnake(fstCoords);
-  if (sndCoords.size() != 0) _drawSnake(sndCoords);
+  if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts);
+  if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts);
   SDL_SetRenderDrawColor(_renderer, 51, 51, 51, 255);
   SDL_RenderPresent(_renderer);
 }
