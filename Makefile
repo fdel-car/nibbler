@@ -54,7 +54,7 @@ $(OBJS_DIR)/GLFW/%.o: $(SRCS_DIR)/GLFW/%.cpp
 $(DYLIBS_DIR)/SFMLDisplay.so: $(SFML_OBJS)
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(SFML_OBJS) -o $(DYLIBS_DIR)/SFMLDisplay.so `pkg-config --libs sfml-window sfml-graphics`
 $(OBJS_DIR)/SFML/%.o: $(SRCS_DIR)/SFML/%.cpp
-	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-graphics`
 
 # SDL dylib
 $(DYLIBS_DIR)/SDLDisplay.so: $(SDL_OBJS)
@@ -66,7 +66,7 @@ $(OBJS_DIR)/SDL/%.o: $(SRCS_DIR)/SDL/%.cpp
 $(DYLIBS_DIR)/SFMLAudio.so: $(AUDIO_OBJS)
 	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(AUDIO_OBJS) -o $(DYLIBS_DIR)/SFMLAudio.so `pkg-config --libs sfml-audio`
 $(OBJS_DIR)/AUDIO/%.o: $(SRCS_DIR)/AUDIO/%.cpp
-	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window`
 
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)

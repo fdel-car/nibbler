@@ -1,6 +1,6 @@
 #pragma once
 
-#define __GAME_LENGTH_UNIT__ 40
+#define __GAME_LENGTH_UNIT__ 30
 
 #include <iostream>
 #include <map>
@@ -27,7 +27,7 @@ class IDisplay {
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
   virtual void renderScene(glm::ivec2 const &appleCoords,
-	  						glm::ivec2 const &bonusFoodCoords,
+                           glm::ivec2 const &meatCoords,
                            SharedData const &fstData,
                            SharedData const &sndData) = 0;
 

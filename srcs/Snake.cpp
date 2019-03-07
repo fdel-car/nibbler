@@ -28,24 +28,22 @@ Snake::Snake(Config config)
     _sndPlayer.keys.down = "DOWN";
     _sndPlayer.keys.right = "RIGHT";
   }
-  _bonusFood.coords.x = _config.width * _snakeUnit;
+  _meat.coords.x = _config.width * _snakeUnit;
   _placeFood(_apple);
   _loadAudio();
   _loadDylib();
 }
 
 void Snake::_loadAudio(void) {
-	void *_handleAudio = dlopen("./dylibs/SFMLAudio.so", RTLD_LAZY);
-    if (!_handleAudio) _dlerrorWrapper();
-    _audioCreator =
-        (IAudio * (*)()) dlsym(_handleAudio, "createAudio");
-    if (!_audioCreator) _dlerrorWrapper();
-    _audioDestructor = (void (*)(IAudio *))dlsym(_handleAudio, "deleteAudio");
-    if (!_audioDestructor) _dlerrorWrapper();
-    _audio = _audioCreator();
-	_audio->playAudio();
+  void *_handleAudio = dlopen("./dylibs/SFMLAudio.so", RTLD_LAZY);
+  if (!_handleAudio) _dlerrorWrapper();
+  _audioCreator = (IAudio * (*)()) dlsym(_handleAudio, "createAudio");
+  if (!_audioCreator) _dlerrorWrapper();
+  _audioDestructor = (void (*)(IAudio *))dlsym(_handleAudio, "deleteAudio");
+  if (!_audioDestructor) _dlerrorWrapper();
+  _audio = _audioCreator();
+  _audio->playAudio();
 }
-
 
 void Snake::_loadDylib(void) {
   _dylibIdx = _newDylibIdx;
@@ -68,9 +66,9 @@ void Snake::_unloadDylib(void) {
 }
 
 Snake::~Snake(void) {
-	_unloadDylib();
-	if (_audio) _audioDestructor(_audio);
-	if (_handleAudio) dlclose(_handleAudio);
+  _unloadDylib();
+  if (_audio) _audioDestructor(_audio);
+  if (_handleAudio) dlclose(_handleAudio);
 }
 
 void Snake::runLoop(void) {
@@ -90,7 +88,7 @@ void Snake::runLoop(void) {
                     .count();
 
     _display->pollEvent(_keyMap);
-    _display->renderScene(_apple.coords, _bonusFood.coords, _fstPlayer.data,
+    _display->renderScene(_apple.coords, _meat.coords, _fstPlayer.data,
                           _sndPlayer.data);
 
     // Switch lib if asked
@@ -111,7 +109,8 @@ void Snake::runLoop(void) {
 bool Snake::_handlePlayer(Player &player, Player &opponent) {
   if (!player.data.bodyParts.size() || !player.allDirs.size()) return false;
 
-  player.distCrawled += deltaTime * _snakeUnit * (1.f / _interval);
+  player.distCrawled +=
+      deltaTime * _snakeUnit * (1.f / _interval) * player.speed;
   int toCrawl = (int)player.distCrawled - player.prevCrawled;
   if ((int)player.distCrawled >= _snakeUnit) {
     player.distCrawled = fmod(player.distCrawled, (float)_snakeUnit);
@@ -119,7 +118,7 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
     player.prevCrawled = 0;
     if (toCrawl > 0) _moveSnake(player, toCrawl);
     _foodHandler(player);
-	_dropBonusFood();
+    _dropBonusFood();
     _handleMoveInput(player);
   } else {
     if (toCrawl > 0) _moveSnake(player, toCrawl);
@@ -151,16 +150,15 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
 }
 
 void Snake::_dropBonusFood(void) {
-	if (_bonusFood.coords.x == _config.width * _snakeUnit && (rand() % 50) == 42) {
-		int limit =  sqrt(_config.width * _config.width + _config.height *  _config.height);
-		std::cout << limit << std::endl;
-		_placeFood(_bonusFood);
-		_bonusFood.lifeTime = _config.twoPlayers ? limit << 2 : limit;
-	}
-	else if (_bonusFood.lifeTime > 0)
-		_bonusFood.lifeTime--;
-	else if (_bonusFood.lifeTime == 0)
-		_bonusFood.coords.x = _config.width * _snakeUnit;
+  if (_meat.coords.x == _config.width * _snakeUnit && (rand() % 50) == 42) {
+    int limit =
+        sqrt(_config.width * _config.width + _config.height * _config.height);
+    _placeFood(_meat);
+    _meat.lifeTime = _config.twoPlayers ? limit << 1 : limit;
+  } else if (_meat.lifeTime > 0)
+    _meat.lifeTime--;
+  else if (_meat.lifeTime == 0)
+    _meat.coords.x = _config.width * _snakeUnit;
 }
 
 bool Snake::_killPlayer(Player &player) {
@@ -178,12 +176,13 @@ void Snake::_foodHandler(Player &player) {
   if (player.data.bodyParts.front() == _apple.coords) {
     player.newBodyPart = player.data.bodyParts.back();
     player.newDirAngle = player.allDirs.back();
+    player.speed += 0.01f;
     _placeFood(_apple);
     player.hasEaten = true;
   }
-  if (player.data.bodyParts.front() == _bonusFood.coords) {
-	_bonusFood.coords.x = _config.width * _snakeUnit;
-	_bonusFood.lifeTime = -1;
+  if (player.data.bodyParts.front() == _meat.coords) {
+    _meat.coords.x = _config.width * _snakeUnit;
+    _meat.lifeTime = -1;
   }
 }
 

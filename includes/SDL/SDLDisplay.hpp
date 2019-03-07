@@ -12,8 +12,8 @@ class SDLDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(glm::ivec2 const &appleCoords, glm::ivec2 const &bonusFoodCoords, SharedData const &fstData,
-                   SharedData const &sndData);
+  void renderScene(glm::ivec2 const &appleCoords, glm::ivec2 const &meatCoords,
+                   SharedData const &fstData, SharedData const &sndData);
 
  private:
   SDL_Window *_window = NULL;

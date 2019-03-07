@@ -14,7 +14,6 @@ GLFWDisplay::GLFWDisplay(int w, int h) {
   _shaderProgram->setMat4("VP", projectionMatrix * viewMatrix);
 
   _food = new Circle(__GAME_LENGTH_UNIT__ / 2.f);
-
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
@@ -101,7 +100,8 @@ void GLFWDisplay::_drawSnake(SharedData const &data,
   _drawEyes(bodySnake.front(), data.dirAngle);
 }
 
-void GLFWDisplay::_drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color) {
+void GLFWDisplay::_drawFood(glm::ivec2 const &appleCoords,
+                            glm::vec3 const color) {
   _food->setPosition(appleCoords);
   _food->setColor(color);
   _food->render(*_shaderProgram);
@@ -144,14 +144,14 @@ void GLFWDisplay::_drawEyes(Circle const &snakeHead, int const dirAngle) {
 }
 
 void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
-								 glm::ivec2 const &bonusFoodCoords,
+                              glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
                               SharedData const &sndData) {
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   _drawFood(appleCoords, glm::vec3(0.8f, 0.f, 0.f));
-  _drawFood(bonusFoodCoords, glm::vec3(1.f, 1.f, 0.f));
+  _drawFood(meatCoords, glm::vec3(1.f, 1.f, 0.f));
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData, _fstBody);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData, _sndBody);
 

@@ -83,14 +83,14 @@ void SDLDisplay::_drawFood(glm::ivec2 const &appleCoords) {
 }
 
 void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
-							 glm::ivec2 const &bonusFoodCoords,
-							 SharedData const &fstData,
+                             glm::ivec2 const &meatCoords,
+                             SharedData const &fstData,
                              SharedData const &sndData) {
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawFood(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);
-  _drawFood(bonusFoodCoords);
+  _drawFood(meatCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts);

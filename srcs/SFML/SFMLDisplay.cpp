@@ -46,19 +46,20 @@ void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void SFMLDisplay::_drawFood(glm::ivec2 const &appleCoords, sf::Color const color) {
+void SFMLDisplay::_drawFood(glm::ivec2 const &appleCoords,
+                            sf::Color const color) {
   _food.setPosition(appleCoords.x, appleCoords.y);
   _food.setFillColor(color);
   _window.draw(_food);
 }
 
 void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
-							  glm::ivec2 const &bonusFoodCoords,
+                              glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
                               SharedData const &sndData) {
   _window.clear(sf::Color(51, 51, 51, 255));
   _drawFood(appleCoords, sf::Color(255, 0, 0));
-  _drawFood(bonusFoodCoords, sf::Color(255, 255, 0));
+  _drawFood(meatCoords, sf::Color(255, 255, 0));
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, &_fstBody);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts, &_sndBody);
   _window.display();

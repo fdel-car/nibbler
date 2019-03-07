@@ -3,11 +3,8 @@
 #include <dlfcn.h>
 #include <algorithm>
 #include <ctime>
-#include "IDisplay.hpp"
 #include "IAudio.hpp"
-
-#define WIDTH 1280
-#define HEIGHT 720
+#include "IDisplay.hpp"
 
 struct Config {
   int width;
@@ -72,7 +69,7 @@ class Snake {
   float _interval;
   int const _snakeUnit;
   Food _apple;
-  Food _bonusFood;
+  Food _meat;
 
   static std::vector<std::string> _dylibsPaths;
 

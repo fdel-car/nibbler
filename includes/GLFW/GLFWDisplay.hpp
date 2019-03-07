@@ -13,9 +13,8 @@ class GLFWDisplay : public IDisplay {
 
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
-  void renderScene(glm::ivec2 const &appleCoords, glm::ivec2 const &bonusFoodCoords,
-	  SharedData const &fstData,
-                   SharedData const &sndData);
+  void renderScene(glm::ivec2 const &appleCoords, glm::ivec2 const &meatCoords,
+                   SharedData const &fstData, SharedData const &sndData);
 
  private:
   int _width, _height;
@@ -39,7 +38,7 @@ class GLFWDisplay : public IDisplay {
                   std::vector<Circle> &bodySnake);
   void _drawEyes(Circle const &snakeHead, int const dirAngle);
 
- void _drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color);
+  void _drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color);
 
   static void _keyCallback(GLFWwindow *window, int key, int scancode,
                            int action, int mods);
