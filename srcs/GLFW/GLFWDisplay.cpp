@@ -13,13 +13,13 @@ GLFWDisplay::GLFWDisplay(int w, int h) {
   glUseProgram(_shaderProgram->getID());
   _shaderProgram->setMat4("VP", projectionMatrix * viewMatrix);
 
-  _apple = new Circle(15.f);
-  _apple->setColor(glm::vec3(1.f, 0.f, 0.f));
+  _food = new Circle(15.f);
+
 }
 
 GLFWDisplay::~GLFWDisplay(void) {
   if (_shaderProgram) delete _shaderProgram;
-  if (_apple) delete _apple;
+  if (_food) delete _food;
   glfwTerminate();
 }
 
@@ -97,18 +97,21 @@ void GLFWDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void GLFWDisplay::_drawApple(glm::ivec2 const &appleCoords) {
-  _apple->setPosition(appleCoords);
-  _apple->render(*_shaderProgram);
+void GLFWDisplay::_drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color) {
+  _food->setPosition(appleCoords);
+  _food->setColor(color);
+  _food->render(*_shaderProgram);
 }
 
 void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
+							  glm::ivec2 const &bonusFoodCoords,
                               std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  _drawApple(appleCoords);
+  _drawFood(appleCoords, glm::vec3(0.8f, 0.f, 0.f));
+  _drawFood(bonusFoodCoords, glm::vec3(1.f, 1.f, 0.f));
   if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
 

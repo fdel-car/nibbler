@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include "IDisplay.hpp"
+#include "IAudio.hpp"
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -38,7 +39,7 @@ struct Player {
 
 struct Food {
   glm::ivec2 coords;
-  double lifeTime = -1.f;
+  int lifeTime = -1;
 };
 
 class Snake {
@@ -57,16 +58,24 @@ class Snake {
   Config _config;
   size_t _dylibIdx;
   size_t _newDylibIdx;
+
   void *_handle = nullptr;
   IDisplay *(*_displayCreator)(int w, int h);
   void (*_displayDestructor)(IDisplay *);
   IDisplay *_display = nullptr;
+
+  void *_handleAudio = nullptr;
+  IAudio *(*_audioCreator)();
+  void (*_audioDestructor)(IAudio *);
+  IAudio *_audio = nullptr;
+
   std::map<std::string, KeyState> _keyMap;
   Player _fstPlayer;
   Player _sndPlayer;
   float _interval;
   int const _snakeUnit;
   Food _apple;
+  Food _bonusFood;
 
   static std::vector<std::string> _dylibsPaths;
 
@@ -76,10 +85,12 @@ class Snake {
   void _dlerrorWrapper(void);
   void _handleMoveInput(Player &player);
   void _moveSnake(Player &player, int toCrawl);
+  void _loadAudio(void);
   void _loadDylib(void);
   void _unloadDylib(void);
   void _foodHandler(Player &player);
-  void _placeApple(void);
+  void _placeFood(Food &food);
+  void _dropBonusFood(void);
   bool _handlePlayer(Player &player, Player &opponent);
   bool _killPlayer(Player &player);
 

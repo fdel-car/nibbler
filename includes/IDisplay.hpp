@@ -1,8 +1,5 @@
 #pragma once
 
-#define WIDTH 1280
-#define HEIGHT 720
-
 #include <iostream>
 #include <map>
 #include <unordered_map>
@@ -23,6 +20,7 @@ class IDisplay {
   virtual bool windowIsOpen(void) const = 0;
   virtual void pollEvent(std::map<std::string, KeyState> &keyMap) = 0;
   virtual void renderScene(glm::ivec2 const &appleCoords,
+	  					   glm::ivec2 const &bonusFoodCoords,
                            std::vector<glm::ivec2> const &fstCoords,
                            std::vector<glm::ivec2> const &sndCoords) = 0;
 

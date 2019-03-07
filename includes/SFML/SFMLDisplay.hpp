@@ -13,6 +13,7 @@ class SFMLDisplay : public IDisplay {
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
   void renderScene(glm::ivec2 const &appleCoords,
+	  			   glm::ivec2 const &bonusFoodCoords,
                    std::vector<glm::ivec2> const &fstCoords,
                    std::vector<glm::ivec2> const &sndCoords);
 
@@ -21,7 +22,7 @@ class SFMLDisplay : public IDisplay {
   sf::Event _event;
   std::vector<sf::CircleShape> _fstBody;
   std::vector<sf::CircleShape> _sndBody;
-  sf::CircleShape _apple;
+  sf::CircleShape _food;
 
   static std::map<ushort, std::string> _keyMap;
 
@@ -32,7 +33,7 @@ class SFMLDisplay : public IDisplay {
 
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                   std::vector<sf::CircleShape> *bodySnake);
-  void _drawApple(glm::ivec2 const &appleCoords);
+  void _drawFood(glm::ivec2 const &appleCoords, sf::Color const color);
   static std::map<ushort, std::string> _initKeyMap(void);
 };
 

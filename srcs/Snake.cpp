@@ -28,10 +28,24 @@ Snake::Snake(Config config)
     _sndPlayer.keys.down = "DOWN";
     _sndPlayer.keys.right = "RIGHT";
   }
-
-  _placeApple();
+  _bonusFood.coords.x = _config.width * _snakeUnit;
+  _placeFood(_apple);
+  _loadAudio();
   _loadDylib();
 }
+
+void Snake::_loadAudio(void) {
+	void *_handleAudio = dlopen("./dylibs/SFMLAudio.so", RTLD_LAZY);
+    if (!_handleAudio) _dlerrorWrapper();
+    _audioCreator =
+        (IAudio * (*)()) dlsym(_handleAudio, "createAudio");
+    if (!_audioCreator) _dlerrorWrapper();
+    _audioDestructor = (void (*)(IAudio *))dlsym(_handleAudio, "deleteAudio");
+    if (!_audioDestructor) _dlerrorWrapper();
+    _audio = _audioCreator();
+	_audio->playAudio();
+}
+
 
 void Snake::_loadDylib(void) {
   _dylibIdx = _newDylibIdx;
@@ -48,14 +62,16 @@ void Snake::_loadDylib(void) {
 }
 
 void Snake::_unloadDylib(void) {
-  if (_display && _handle) {
-    _keyMap.clear();
-    _displayDestructor(_display);
-    dlclose(_handle);
-  }
+  if (_display) _displayDestructor(_display);
+  if (_handle) dlclose(_handle);
+  _keyMap.clear();
 }
 
-Snake::~Snake(void) { _unloadDylib(); }
+Snake::~Snake(void) {
+	_unloadDylib();
+	if (_audio) _audioDestructor(_audio);
+	if (_handleAudio) dlclose(_handleAudio);
+}
 
 void Snake::runLoop(void) {
   if (!_display)
@@ -74,7 +90,7 @@ void Snake::runLoop(void) {
                     .count();
 
     _display->pollEvent(_keyMap);
-    _display->renderScene(_apple.coords, _fstPlayer.bodyParts,
+    _display->renderScene(_apple.coords, _bonusFood.coords, _fstPlayer.bodyParts,
                           _sndPlayer.bodyParts);
 
     // Switch lib if asked
@@ -103,6 +119,7 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
     player.prevCrawled = 0;
     if (toCrawl > 0) _moveSnake(player, toCrawl);
     _foodHandler(player);
+	_dropBonusFood();
     _handleMoveInput(player);
   } else {
     if (toCrawl > 0) _moveSnake(player, toCrawl);
@@ -133,6 +150,19 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
   return true;
 }
 
+void Snake::_dropBonusFood(void) {
+	if (_bonusFood.coords.x == _config.width * _snakeUnit && (rand() % 50) == 42) {
+		int limit =  sqrt(_config.width * _config.width + _config.height *  _config.height);
+		std::cout << limit << std::endl;
+		_placeFood(_bonusFood);
+		_bonusFood.lifeTime = _config.twoPlayers ? limit << 2 : limit;
+	}
+	else if (_bonusFood.lifeTime > 0)
+		_bonusFood.lifeTime--;
+	else if (_bonusFood.lifeTime == 0)
+		_bonusFood.coords.x = _config.width * _snakeUnit;
+}
+
 bool Snake::_killPlayer(Player &player) {
   player.bodyParts.clear();
   player.allDirs.clear();
@@ -148,12 +178,16 @@ void Snake::_foodHandler(Player &player) {
   if (player.bodyParts.front() == _apple.coords) {
     player.newBodyPart = player.bodyParts.back();
     player.newDir = player.allDirs.back();
-    _placeApple();
+    _placeFood(_apple);
     player.hasEaten = true;
+  }
+  if (player.bodyParts.front() == _bonusFood.coords) {
+	_bonusFood.coords.x = _config.width * _snakeUnit;
+	_bonusFood.lifeTime = -1;
   }
 }
 
-void Snake::_placeApple(void) {
+void Snake::_placeFood(Food &food) {
   size_t mapSize = _config.width * _config.height;
   std::vector<glm::ivec2> freePlaces;
 
@@ -175,7 +209,7 @@ void Snake::_placeApple(void) {
 
   if (!freePlaces.size())
     throw std::runtime_error("You won! I've never seen that before...");
-  _apple.coords = freePlaces[rand() % freePlaces.size()];
+  food.coords = freePlaces[rand() % freePlaces.size()];
 }
 
 bool Snake::isKeyPressed(std::string key) const {

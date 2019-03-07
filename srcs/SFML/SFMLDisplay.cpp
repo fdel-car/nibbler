@@ -9,8 +9,7 @@ SFMLDisplay::SFMLDisplay(int w, int h)
           _window.getSize().y * 0.5f));
   _window.setFramerateLimit(60);
 
-  _apple = sf::CircleShape(15.f);
-  _apple.setFillColor(sf::Color(255, 0, 0));
+  _food = sf::CircleShape(15.f);
 }
 
 SFMLDisplay::~SFMLDisplay(void) {}
@@ -47,16 +46,19 @@ void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
   }
 }
 
-void SFMLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
-  _apple.setPosition(appleCoords.x, appleCoords.y);
-  _window.draw(_apple);
+void SFMLDisplay::_drawFood(glm::ivec2 const &appleCoords, sf::Color const color) {
+  _food.setPosition(appleCoords.x, appleCoords.y);
+  _food.setFillColor(color);
+  _window.draw(_food);
 }
 
 void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
+							  glm::ivec2 const &bonusFoodCoords,
                               std::vector<glm::ivec2> const &fstCoords,
                               std::vector<glm::ivec2> const &sndCoords) {
   _window.clear(sf::Color(51, 51, 51, 255));
-  _drawApple(appleCoords);
+  _drawFood(appleCoords, sf::Color(255, 0, 0));
+  _drawFood(bonusFoodCoords, sf::Color(255, 255, 0));
   if (fstCoords.size() != 0) _drawSnake(fstCoords, &_fstBody);
   if (sndCoords.size() != 0) _drawSnake(sndCoords, &_sndBody);
   _window.display();

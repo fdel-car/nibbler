@@ -32,12 +32,15 @@ SFML_OBJS := $(patsubst $(SRCS_DIR)/SFML/%.cpp,$(OBJS_DIR)/SFML/%.o,$(SFML_SRCS)
 SDL_SRCS := $(shell find $(SRCS_DIR)/SDL -maxdepth 1 -name "*.cpp")
 SDL_OBJS := $(patsubst $(SRCS_DIR)/SDL/%.cpp,$(OBJS_DIR)/SDL/%.o,$(SDL_SRCS))
 
+AUDIO_SRCS := $(shell find $(SRCS_DIR)/AUDIO -maxdepth 1 -name "*.cpp")
+AUDIO_OBJS := $(patsubst $(SRCS_DIR)/AUDIO/%.cpp,$(OBJS_DIR)/AUDIO/%.o,$(AUDIO_SRCS))
+
 all: $(OBJS_DIR) $(DYLIBS_DIR) $(TARGET)
 
 ignore-warnings: all
 
 $(shell mkdir -p $(DYLIBS_DIR)) # Funny practice
-$(DYLIBS_DIR): $(DYLIBS_DIR)/GLFWDisplay.so $(DYLIBS_DIR)/SFMLDisplay.so $(DYLIBS_DIR)/SDLDisplay.so
+$(DYLIBS_DIR): $(DYLIBS_DIR)/GLFWDisplay.so $(DYLIBS_DIR)/SFMLDisplay.so $(DYLIBS_DIR)/SDLDisplay.so $(DYLIBS_DIR)/SFMLAudio.so
 	@echo "$(GREEN)Successfully compiled the dynamic libraries.$(RESET)"
 
 # GLFW dylib
@@ -59,12 +62,19 @@ $(DYLIBS_DIR)/SDLDisplay.so: $(SDL_OBJS)
 $(OBJS_DIR)/SDL/%.o: $(SRCS_DIR)/SDL/%.cpp
 	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) -F/Library/Frameworks
 
+# AUDIO dylib
+$(DYLIBS_DIR)/SFMLAudio.so: $(AUDIO_OBJS)
+	@$(CC) $(DYLIBS_FLAGS) $(CFLAGS) $(AUDIO_OBJS) -o $(DYLIBS_DIR)/SFMLAudio.so `pkg-config --libs sfml-audio`
+$(OBJS_DIR)/AUDIO/%.o: $(SRCS_DIR)/AUDIO/%.cpp
+	@$(CC) $(CFLAGS) -c $^ -o $@ $(HEADERS) `pkg-config --cflags sfml-window sfml-graphics`
+
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 	@mkdir -p $(OBJS_DIR)/glad
 	@mkdir -p $(OBJS_DIR)/GLFW
 	@mkdir -p $(OBJS_DIR)/SFML
 	@mkdir -p $(OBJS_DIR)/SDL
+	@mkdir -p $(OBJS_DIR)/AUDIO
 
 $(TARGET): $(OBJS)
 	@$(CC) $(CFLAGS) -o $@ $^ # $(LIBS)

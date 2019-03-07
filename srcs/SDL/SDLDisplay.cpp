@@ -4,7 +4,6 @@ SDLDisplay::SDLDisplay(int w, int h) {
   if (SDL_Init(SDL_INIT_VIDEO) != 0)
     throw std::runtime_error(std::string("Failed to initialize the SDL, ") +
                              SDL_GetError());
-
   _window = SDL_CreateWindow("Nibbler - SDL", SDL_WINDOWPOS_CENTERED,
                              SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
   if (!_window)
@@ -19,7 +18,8 @@ SDLDisplay::SDLDisplay(int w, int h) {
 }
 
 SDLDisplay::~SDLDisplay(void) {
-  SDL_DestroyWindow(_window);
+  if (_renderer) SDL_DestroyRenderer(_renderer);
+  if (_window) SDL_DestroyWindow(_window);
   SDL_Quit();
 }
 
@@ -77,16 +77,19 @@ void SDLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords) {
   }
 }
 
-void SDLDisplay::_drawApple(glm::ivec2 const &appleCoords) {
+void SDLDisplay::_drawFood(glm::ivec2 const &appleCoords) {
   _drawCircle(appleCoords.x, appleCoords.y, 15);
 }
 
 void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
+							 glm::ivec2 const &bonusFoodCoords,
                              std::vector<glm::ivec2> const &fstCoords,
                              std::vector<glm::ivec2> const &sndCoords) {
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
-  _drawApple(appleCoords);
+  _drawFood(appleCoords);
+  SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);
+  _drawFood(bonusFoodCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
   if (fstCoords.size() != 0) _drawSnake(fstCoords);
   if (sndCoords.size() != 0) _drawSnake(sndCoords);

@@ -13,6 +13,7 @@ class SDLDisplay : public IDisplay {
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
   void renderScene(glm::ivec2 const &appleCoords,
+	  			   glm::ivec2 const &bonusFoodCoords,
                    std::vector<glm::ivec2> const &fstCoords,
                    std::vector<glm::ivec2> const &sndCoords);
 
@@ -31,7 +32,7 @@ class SDLDisplay : public IDisplay {
 
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords);
   void _drawCircle(int _x, int _y, int radius);
-  void _drawApple(glm::ivec2 const &appleCoords);
+  void _drawFood(glm::ivec2 const &appleCoords);
 
   static std::map<ushort, std::string> _initKeyMap(void);
 };
