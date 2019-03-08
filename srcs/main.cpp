@@ -1,7 +1,7 @@
 #include "Snake.hpp"
 
 static void printUsage() {
-  std::cerr << "usage: ./nibbler [width] [height] [-m]" << std::endl;
+  std::cerr << "usage: ./nibbler [width] [height] [-mo]" << std::endl;
 }
 
 static int printError(std::string err) {
@@ -36,8 +36,16 @@ int main(int ac, char **av) {
       return printError(
           "Invalid width and height. They should be between 20 and 40.");
     for (int i = 3; i < ac; i++) {
-      if (strcmp(av[i], "-m") == 0)
-        config.twoPlayers = true;
+	  if (av[i][0] == '-' && strlen(av[i]) > 1) {
+		  for (size_t j = 1; strlen(av[i]) > j; j++) {
+			  if (av[i][j] == 'm' && !config.twoPlayers)
+			  	config.twoPlayers = true;
+			  else if (av[i][j] == 'o' && !config.obstacles)
+			  	config.obstacles = true;
+			  else
+			  	return printError("Invalid flags.");
+		  }
+	  }
       else
         return printError("Invalid flags.");
     }
