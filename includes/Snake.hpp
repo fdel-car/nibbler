@@ -29,6 +29,7 @@ struct Player {
   int newDirAngle;
   bool hasEaten = false;
   Keys keys;
+  int score = 0;
 };
 
 struct Food {

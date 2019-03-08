@@ -147,6 +147,7 @@ void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
                               glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
                               SharedData const &sndData) {
+  _displayScore(fstData, sndData);
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -156,6 +157,11 @@ void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData, _sndBody);
 
   glfwSwapBuffers(_window);
+}
+
+void GLFWDisplay::_displayScore(SharedData const &fstData, SharedData const &sndData) {
+	std::string score = "Nibbler - GLFW " + fstData.score + (sndData.score.size() ? " | " + sndData.score : "");
+	glfwSetWindowTitle(_window, score.c_str());
 }
 
 std::vector<std::string> GLFWDisplay::_keyPressed = std::vector<std::string>();

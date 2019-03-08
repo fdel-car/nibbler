@@ -31,6 +31,7 @@ class SDLDisplay : public IDisplay {
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords);
   void _drawCircle(int _x, int _y, int radius);
   void _drawFood(glm::ivec2 const &appleCoords);
+  void _displayScore(SharedData const &fstData, SharedData const &sndData);
 
   static std::map<ushort, std::string> _initKeyMap(void);
 };

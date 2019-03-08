@@ -39,6 +39,7 @@ class GLFWDisplay : public IDisplay {
   void _drawEyes(Circle const &snakeHead, int const dirAngle);
 
   void _drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color);
+  void _displayScore(SharedData const &fstData, SharedData const &sndData);
 
   static void _keyCallback(GLFWwindow *window, int key, int scancode,
                            int action, int mods);

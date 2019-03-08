@@ -57,12 +57,18 @@ void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
                               glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
                               SharedData const &sndData) {
+  _displayScore(fstData, sndData);
   _window.clear(sf::Color(51, 51, 51, 255));
   _drawFood(appleCoords, sf::Color(255, 0, 0));
   _drawFood(meatCoords, sf::Color(255, 255, 0));
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, &_fstBody);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts, &_sndBody);
   _window.display();
+}
+
+void SFMLDisplay::_displayScore(SharedData const &fstData, SharedData const &sndData) {
+	std::string score = "Nibbler - SFML " + fstData.score + (sndData.score.size() ? " | " + sndData.score : "");
+	_window.setTitle(score);
 }
 
 std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
