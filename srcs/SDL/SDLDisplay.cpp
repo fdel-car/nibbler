@@ -73,6 +73,10 @@ void SDLDisplay::_drawCircle(int _x, int _y, int radius) {
 
 void SDLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords) {
   for (size_t i = 0; i < snakeCoords.size(); i++) {
+    if (i == 0)
+      SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);
+    else
+      SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
     _drawCircle(snakeCoords.at(i).x, snakeCoords.at(i).y,
                 __GAME_LENGTH_UNIT__ / 2.f);
   }
@@ -83,15 +87,15 @@ void SDLDisplay::_drawFood(glm::ivec2 const &appleCoords) {
 }
 
 void SDLDisplay::_drawObstacles(std::vector<glm::ivec2> const &obstacles) {
-    for (const auto &obstacle : obstacles)
-      _drawCircle(obstacle.x, obstacle.y, __GAME_LENGTH_UNIT__ / 2.f);
+  for (const auto &obstacle : obstacles)
+    _drawCircle(obstacle.x, obstacle.y, __GAME_LENGTH_UNIT__ / 2.f);
 }
 
 void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
                              glm::ivec2 const &meatCoords,
                              SharedData const &fstData,
                              SharedData const &sndData,
-						 	 std::vector<glm::ivec2> const &obstacles) {
+                             std::vector<glm::ivec2> const &obstacles) {
   _displayScore(fstData, sndData);
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 128, 128, 128, 255);
@@ -100,7 +104,6 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
   _drawFood(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 184, 104, 0, 255);
   _drawFood(meatCoords);
-  SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts);
   SDL_SetRenderDrawColor(_renderer, 51, 51, 51, 255);

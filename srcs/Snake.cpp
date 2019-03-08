@@ -16,8 +16,9 @@ Snake::Snake(Config config)
 }
 
 void Snake::_initGame(void) {
-  int xPos = _config.width / 3;
-  int yPos = _config.height / 3;
+  int xPos = _config.width / (_config.twoPlayers ? 3 : 2);
+  int yPos = _config.height / (_config.twoPlayers ? 3 : 2);
+  if (!_config.twoPlayers) yPos -= 4;
 
   _fstPlayer = Player();
   _fstPlayer.data.dirAngle = 180;
@@ -41,8 +42,7 @@ void Snake::_initGame(void) {
     _sndPlayer.keys.right = "RIGHT";
   }
   _meat.coords.x = _config.width * _snakeUnit;
-  if (_config.obstacles)
-  	_initObstacles();
+  if (_config.obstacles) _initObstacles();
   _placeFood(_apple, _meat);
 }
 
@@ -50,12 +50,14 @@ void Snake::_initObstacles(void) {
   int x = _config.width / 9;
   int y = _config.height / 9;
   for (int tmp = x * 4; tmp < x * 6; tmp++) {
-	  _obstacles.push_back(glm::ivec2(tmp * _snakeUnit, y * _snakeUnit));
-	  _obstacles.push_back(glm::ivec2(tmp * _snakeUnit, (_config.height - y - 1) * _snakeUnit));
+    _obstacles.push_back(glm::ivec2(tmp * _snakeUnit, y * _snakeUnit));
+    _obstacles.push_back(
+        glm::ivec2(tmp * _snakeUnit, (_config.height - y - 1) * _snakeUnit));
   }
   for (int tmp = y * 4; tmp < y * 6; tmp++) {
-	  _obstacles.push_back(glm::ivec2(x * _snakeUnit, tmp * _snakeUnit));
-	  _obstacles.push_back(glm::ivec2((_config.width - x - 1) * _snakeUnit, tmp * _snakeUnit));
+    _obstacles.push_back(glm::ivec2(x * _snakeUnit, tmp * _snakeUnit));
+    _obstacles.push_back(
+        glm::ivec2((_config.width - x - 1) * _snakeUnit, tmp * _snakeUnit));
   }
 }
 
@@ -182,9 +184,9 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
     return _killPlayer(player);
   // Obstacles collision
   for (const auto &obstacle : _obstacles) {
-	  glm::ivec2 tmp = snakeHead - obstacle;
-	  float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
-	  if (distance < _snakeUnit / 2) return _killPlayer(player);
+    glm::ivec2 tmp = snakeHead - obstacle;
+    float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+    if (distance < _snakeUnit / 2) return _killPlayer(player);
   }
   return true;
 }
@@ -256,12 +258,12 @@ void Snake::_placeFood(Food &food, Food &otherFood) {
         break;
       }
     if (collision) continue;
-	if (_config.obstacles)
-		for (auto obstacle : _obstacles)
-	      if (x == obstacle.x / _snakeUnit && y == obstacle.y / _snakeUnit)
-	        collision = true;
-	if (collision) continue;
-	if (otherFood.coords.x == x && otherFood.coords.y == y) continue;
+    if (_config.obstacles)
+      for (auto obstacle : _obstacles)
+        if (x == obstacle.x / _snakeUnit && y == obstacle.y / _snakeUnit)
+          collision = true;
+    if (collision) continue;
+    if (otherFood.coords.x == x && otherFood.coords.y == y) continue;
     freePlaces.push_back(glm::ivec2(x * _snakeUnit, y * _snakeUnit));
   }
 

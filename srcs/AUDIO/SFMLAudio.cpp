@@ -6,7 +6,7 @@ SFMLAudio::~SFMLAudio(void) {}
 
 void SFMLAudio::playAudio(void) {
   if (_music.openFromFile("./audio.ogg")) {
-    // _music.play();
+    _music.play();
     _music.setLoop(true);
   }
 }
