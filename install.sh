@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ERROR="\033[1;31m"
 WARNING="\033[1;33m"
 RESET="\033[0m"
