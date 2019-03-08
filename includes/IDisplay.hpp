@@ -30,7 +30,8 @@ class IDisplay {
   virtual void renderScene(glm::ivec2 const &appleCoords,
                            glm::ivec2 const &meatCoords,
                            SharedData const &fstData,
-                           SharedData const &sndData) = 0;
+                           SharedData const &sndData,
+					   	   std::vector<glm::ivec2> const &obstacles) = 0;
 
   virtual ~IDisplay(){};
 };

@@ -41,7 +41,22 @@ void Snake::_initGame(void) {
     _sndPlayer.keys.right = "RIGHT";
   }
   _meat.coords.x = _config.width * _snakeUnit;
+  if (_config.obstacles)
+  	_initObstacles();
   _placeFood(_apple, _meat);
+}
+
+void Snake::_initObstacles(void) {
+  int x = _config.width / 9;
+  int y = _config.height / 9;
+  for (int tmp = x * 4; tmp < x * 6; tmp++) {
+	  _obstacles.push_back(glm::ivec2(tmp * _snakeUnit, y * _snakeUnit));
+	  _obstacles.push_back(glm::ivec2(tmp * _snakeUnit, (_config.height - y - 1) * _snakeUnit));
+  }
+  for (int tmp = y * 4; tmp < y * 6; tmp++) {
+	  _obstacles.push_back(glm::ivec2(x * _snakeUnit, tmp * _snakeUnit));
+	  _obstacles.push_back(glm::ivec2((_config.width - x - 1) * _snakeUnit, tmp * _snakeUnit));
+  }
 }
 
 void Snake::_loadAudio(void) {
@@ -106,7 +121,7 @@ void Snake::runLoop(void) {
     }
 
     _display->renderScene(_apple.coords, _meat.coords, _fstPlayer.data,
-                          _sndPlayer.data);
+                          _sndPlayer.data, _obstacles);
 
     // Switch lib if asked
     if (isKeyJustPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
@@ -165,6 +180,12 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
   if (snakeHead.x < 0 || snakeHead.x > (_config.width - 1) * _snakeUnit ||
       snakeHead.y < 0 || snakeHead.y > (_config.height - 1) * _snakeUnit)
     return _killPlayer(player);
+  // Obstacles collision
+  for (const auto &obstacle : _obstacles) {
+	  glm::ivec2 tmp = snakeHead - obstacle;
+	  float distance = sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+	  if (distance < _snakeUnit / 2) return _killPlayer(player);
+  }
   return true;
 }
 
@@ -235,7 +256,12 @@ void Snake::_placeFood(Food &food, Food &otherFood) {
         break;
       }
     if (collision) continue;
-    if (otherFood.coords.x == x && otherFood.coords.y == y) continue;
+	if (_config.obstacles)
+		for (auto obstacle : _obstacles)
+	      if (x == obstacle.x / _snakeUnit && y == obstacle.y / _snakeUnit)
+	        collision = true;
+	if (collision) continue;
+	if (otherFood.coords.x == x && otherFood.coords.y == y) continue;
     freePlaces.push_back(glm::ivec2(x * _snakeUnit, y * _snakeUnit));
   }
 

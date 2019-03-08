@@ -66,12 +66,26 @@ void SFMLDisplay::_drawFood(glm::ivec2 const &appleCoords,
   _window.draw(_food);
 }
 
+void SFMLDisplay::_drawObstacles(std::vector<glm::ivec2> const &obstacles) {
+  size_t size = _obstacles.size();
+  for (size_t i = 0; i < obstacles.size() - size; i++) {
+    _obstacles.push_back(sf::CircleShape(__GAME_LENGTH_UNIT__ / 2.f));
+  }
+  for (size_t i = 0; i < obstacles.size(); i++) {
+    _obstacles[i].setPosition(obstacles[i].x, obstacles[i].y);
+    _obstacles[i].setFillColor(sf::Color(128, 128, 128));
+    _window.draw(_obstacles[i]);
+  }
+}
+
 void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
                               glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
-                              SharedData const &sndData) {
+                              SharedData const &sndData,
+                              std::vector<glm::ivec2> const &obstacles) {
   _displayScore(fstData, sndData);
   _window.clear(sf::Color(51, 51, 51, 255));
+  _drawObstacles(obstacles);
   _drawFood(appleCoords, sf::Color(202, 10, 0));
   _drawFood(meatCoords, sf::Color(144, 64, 0), true);
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, _fstBody);
