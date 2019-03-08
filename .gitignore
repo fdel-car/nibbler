@@ -9,3 +9,6 @@ nibbler
 
 # Settings
 .vscode/
+
+# Others
+*.dSYM/
