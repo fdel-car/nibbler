@@ -35,14 +35,23 @@ void SFMLDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
 }
 
 void SFMLDisplay::_drawSnake(std::vector<glm::ivec2> const &snakeCoords,
-                             std::vector<sf::CircleShape> *bodySnake) {
-  size_t bodySize = bodySnake->size();
+                             std::vector<sf::CircleShape> &bodySnake) {
+  size_t bodySize = bodySnake.size();
+  if (bodySize > snakeCoords.size()) {
+    bodySnake.clear();
+    bodySize = 0;
+  }
   for (size_t i = 0; i < snakeCoords.size() - bodySize; i++) {
-    bodySnake->push_back(sf::CircleShape(__GAME_LENGTH_UNIT__ / 2.f));
+    bodySnake.emplace_back(__GAME_LENGTH_UNIT__ / 2.f);
+    bodySnake[i + bodySize].setFillColor(sf::Color(100, 128, 80));
+    if (bodySize == 0 && i == 0) {
+      bodySnake[i].setOutlineThickness(__GAME_LENGTH_UNIT__ / 20.f);
+      bodySnake[i].setOutlineColor(sf::Color::Yellow);
+    }
   }
   for (size_t i = 0; i < snakeCoords.size(); i++) {
-    bodySnake->at(i).setPosition(snakeCoords.at(i).x, snakeCoords.at(i).y);
-    _window.draw(bodySnake->at(i));
+    bodySnake[i].setPosition(snakeCoords[i].x, snakeCoords[i].y);
+    _window.draw(bodySnake[i]);
   }
 }
 
@@ -51,7 +60,7 @@ void SFMLDisplay::_drawFood(glm::ivec2 const &appleCoords,
   _food.setPosition(appleCoords.x, appleCoords.y);
   _food.setFillColor(color);
   if (thickness)
-    _food.setOutlineThickness(-__GAME_LENGTH_UNIT__ / 10.f);
+    _food.setOutlineThickness(-__GAME_LENGTH_UNIT__ / 12.f);
   else
     _food.setOutlineThickness(0.f);
   _window.draw(_food);
@@ -63,10 +72,10 @@ void SFMLDisplay::renderScene(glm::ivec2 const &appleCoords,
                               SharedData const &sndData) {
   _displayScore(fstData, sndData);
   _window.clear(sf::Color(51, 51, 51, 255));
-  _drawFood(appleCoords, sf::Color(182, 10, 0));
-  _drawFood(meatCoords, sf::Color(152, 111, 0), true);
-  if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, &_fstBody);
-  if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts, &_sndBody);
+  _drawFood(appleCoords, sf::Color(202, 10, 0));
+  _drawFood(meatCoords, sf::Color(144, 64, 0), true);
+  if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts, _fstBody);
+  if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts, _sndBody);
   _window.display();
 }
 
@@ -92,6 +101,7 @@ std::map<ushort, std::string> SFMLDisplay::_initKeyMap(void) {
   keyMap[sf::Keyboard::Num1] = "1";
   keyMap[sf::Keyboard::Num2] = "2";
   keyMap[sf::Keyboard::Num3] = "3";
+  keyMap[sf::Keyboard::R] = "R";
 
   return keyMap;
 }

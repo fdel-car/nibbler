@@ -10,19 +10,26 @@ Snake::Snake(Config config)
   _diagLength =
       sqrt(_config.width * _config.width + _config.height * _config.height);
 
+  _initGame();
+  _loadAudio();
+  _loadDylib();
+}
+
+void Snake::_initGame(void) {
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
+  _fstPlayer = Player();
+  _fstPlayer.data.dirAngle = 180;
   _fstPlayer.data.score = "0";
   for (int i = 3; i >= 0; i--) {
     _fstPlayer.data.bodyParts.push_back(
         glm::ivec2(xPos * _snakeUnit, (yPos + i) * _snakeUnit));
     _fstPlayer.allDirs.push_back(180);
   }
-
   if (_config.twoPlayers) {
+    _sndPlayer = Player();
     _sndPlayer.data.score = "0";
-    _sndPlayer.data.dirAngle = 0;
     for (int i = 0; i < 4; i++) {
       _sndPlayer.data.bodyParts.push_back(
           glm::ivec2(xPos * 2 * _snakeUnit, (yPos * 2 + i) * _snakeUnit));
@@ -35,8 +42,6 @@ Snake::Snake(Config config)
   }
   _meat.coords.x = _config.width * _snakeUnit;
   _placeFood(_apple, _meat);
-  _loadAudio();
-  _loadDylib();
 }
 
 void Snake::_loadAudio(void) {
@@ -86,6 +91,7 @@ void Snake::runLoop(void) {
 
   while (_display->windowIsOpen()) {
     if (_newDylibIdx != _dylibIdx) break;
+    for (auto &key : _keyMap) key.second.prevFrame = key.second.currFrame;
 
     currTime = std::chrono::high_resolution_clock::now();
     deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(
@@ -93,13 +99,19 @@ void Snake::runLoop(void) {
                     .count();
 
     _display->pollEvent(_keyMap);
+    if (isKeyJustPressed("R")) {
+      fstAlive = true;
+      sndAlive = _config.twoPlayers;
+      _initGame();
+    }
+
     _display->renderScene(_apple.coords, _meat.coords, _fstPlayer.data,
                           _sndPlayer.data);
 
     // Switch lib if asked
-    if (isKeyPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
-    if (isKeyPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
-    if (isKeyPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
+    if (isKeyJustPressed("1") && _dylibIdx != 0) _newDylibIdx = 0;
+    if (isKeyJustPressed("2") && _dylibIdx != 1) _newDylibIdx = 1;
+    if (isKeyJustPressed("3") && _dylibIdx != 2) _newDylibIdx = 2;
 
     if (fstAlive) fstAlive = _handlePlayer(_fstPlayer, _sndPlayer);
     if (sndAlive) sndAlive = _handlePlayer(_sndPlayer, _fstPlayer);

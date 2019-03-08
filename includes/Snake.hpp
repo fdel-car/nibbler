@@ -91,6 +91,8 @@ class Snake {
   void _dropBonusFood(void);
   bool _handlePlayer(Player &player, Player &opponent);
   bool _killPlayer(Player &player);
+  void _initGame(void);
+  void _resetPlayer(Player &player);
 
   static std::vector<std::string> _initDylibsPaths(void);
 

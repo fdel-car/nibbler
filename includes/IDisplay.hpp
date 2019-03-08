@@ -18,7 +18,7 @@ struct KeyState {
 };
 
 struct SharedData {
-  int dirAngle = 180;
+  int dirAngle;
   std::vector<glm::ivec2> bodyParts;
   std::string score;
 };

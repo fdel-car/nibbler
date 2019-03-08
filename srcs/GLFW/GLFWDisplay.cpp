@@ -89,6 +89,10 @@ void GLFWDisplay::pollEvent(std::map<std::string, KeyState> &keyMap) {
 void GLFWDisplay::_drawSnake(SharedData const &data,
                              std::vector<Circle> &bodySnake) {
   size_t bodySize = bodySnake.size();
+  if (bodySize > data.bodyParts.size()) {
+    bodySnake.clear();
+    bodySize = 0;
+  }
   for (size_t i = 0; i < data.bodyParts.size() - bodySize; i++) {
     bodySnake.emplace_back(__GAME_LENGTH_UNIT__ / 2.f);
     bodySnake[i + bodySize].setColor(glm::vec3(0.4f, 0.5f, 0.3f));
@@ -151,8 +155,8 @@ void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  _drawFood(appleCoords, glm::vec3(0.8f, 0.f, 0.f));
-  _drawFood(meatCoords, glm::vec3(1.f, 1.f, 0.f));
+  _drawFood(appleCoords, glm::vec3(0.8f, 0.09f, 0.f));
+  _drawFood(meatCoords, glm::vec3(0.52f, 0.22f, 0.f));
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData, _fstBody);
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData, _sndBody);
 
@@ -200,6 +204,7 @@ std::map<ushort, std::string> GLFWDisplay::_initKeyMap(void) {
   keyMap[GLFW_KEY_1] = "1";
   keyMap[GLFW_KEY_2] = "2";
   keyMap[GLFW_KEY_3] = "3";
+  keyMap[GLFW_KEY_R] = "R";
 
   return keyMap;
 }

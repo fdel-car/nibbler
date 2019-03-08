@@ -90,7 +90,7 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawFood(appleCoords);
-  SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);
+  SDL_SetRenderDrawColor(_renderer, 184, 104, 0, 255);
   _drawFood(meatCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData.bodyParts);
@@ -121,6 +121,7 @@ std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {
   keyMap[SDLK_1] = "1";
   keyMap[SDLK_2] = "2";
   keyMap[SDLK_3] = "3";
+  keyMap[SDLK_r] = "R";
 
   return keyMap;
 }
