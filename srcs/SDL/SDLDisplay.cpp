@@ -107,9 +107,11 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
   SDL_RenderPresent(_renderer);
 }
 
-void SDLDisplay::_displayScore(SharedData const &fstData, SharedData const &sndData) {
-	std::string score = "Nibbler - SDL " + fstData.score + (sndData.score.size() ? " | " + sndData.score : "");
-	SDL_SetWindowTitle(_window, score.c_str());
+void SDLDisplay::_displayScore(SharedData const &fstData,
+                               SharedData const &sndData) {
+  std::string score = "Nibbler - SDL | Score: " + fstData.score +
+                      (sndData.score.size() ? " - " + sndData.score : "");
+  SDL_SetWindowTitle(_window, score.c_str());
 }
 
 std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {

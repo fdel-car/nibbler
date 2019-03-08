@@ -7,6 +7,9 @@ Snake::Snake(Config config)
       _interval(0.2f),
       _snakeUnit(__GAME_LENGTH_UNIT__) {
   _newDylibIdx = _dylibIdx;
+  _diagLength =
+      sqrt(_config.width * _config.width + _config.height * _config.height);
+
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
@@ -18,7 +21,7 @@ Snake::Snake(Config config)
   }
 
   if (_config.twoPlayers) {
-	_sndPlayer.data.score = "0";
+    _sndPlayer.data.score = "0";
     _sndPlayer.data.dirAngle = 0;
     for (int i = 0; i < 4; i++) {
       _sndPlayer.data.bodyParts.push_back(
@@ -33,7 +36,7 @@ Snake::Snake(Config config)
   _meat.coords.x = _config.width * _snakeUnit;
   if (_config.obstacles)
   	_initObstacles();
-  _placeFood(_apple);
+  _placeFood(_apple, _meat);
   _loadAudio();
   _loadDylib();
 }
@@ -126,10 +129,12 @@ void Snake::runLoop(void) {
 bool Snake::_handlePlayer(Player &player, Player &opponent) {
   if (!player.data.bodyParts.size() || !player.allDirs.size()) return false;
 
-  player.distCrawled +=
-      deltaTime * _snakeUnit * (1.f / _interval) * player.speed;
+  float crawled = deltaTime * _snakeUnit * (1.f / _interval) * player.speed;
+  if (player.boostTimer > 0) crawled *= 1.3f;
+  player.distCrawled += crawled;
   int toCrawl = (int)player.distCrawled - player.prevCrawled;
   if ((int)player.distCrawled >= _snakeUnit) {
+    if (player.boostTimer > 0) player.boostTimer--;
     player.distCrawled = fmod(player.distCrawled, (float)_snakeUnit);
     toCrawl -= (int)player.distCrawled;
     player.prevCrawled = 0;
@@ -173,10 +178,10 @@ bool Snake::_handlePlayer(Player &player, Player &opponent) {
 }
 
 void Snake::_dropBonusFood(void) {
-  if (_meat.coords.x == _config.width * _snakeUnit && (rand() % 50) == 42) {
-    int limit =
-        sqrt(_config.width * _config.width + _config.height * _config.height);
-    _placeFood(_meat);
+  int tmp = _config.twoPlayers ? 200 : 100;
+  if (_meat.coords.x == _config.width * _snakeUnit && (rand() % tmp) == 42) {
+    int limit = _diagLength;
+    _placeFood(_meat, _apple);
     _meat.lifeTime = _config.twoPlayers ? limit << 1 : limit;
   } else if (_meat.lifeTime > 0)
     _meat.lifeTime--;
@@ -199,21 +204,26 @@ void Snake::_foodHandler(Player &player) {
   if (player.data.bodyParts.front() == _apple.coords) {
     player.newBodyPart = player.data.bodyParts.back();
     player.newDirAngle = player.allDirs.back();
-    player.speed += 0.01f;
-    _placeFood(_apple);
+    player.speed += 0.02f;
+    _placeFood(_apple, _meat);
     player.hasEaten = true;
-	player.score++;
-	player.data.score = std::to_string(player.score);
+    player.score++;
+    player.data.score = std::to_string(player.score);
   }
   if (player.data.bodyParts.front() == _meat.coords) {
+    player.newBodyPart = player.data.bodyParts.back();
+    player.newDirAngle = player.allDirs.back();
     _meat.coords.x = _config.width * _snakeUnit;
     _meat.lifeTime = -1;
-	player.score += 5;
-	player.data.score = std::to_string(player.score);
+    player.speed += 0.04f;
+    player.boostTimer += _diagLength >> 1;
+    player.hasEaten = true;
+    player.score += 2;
+    player.data.score = std::to_string(player.score);
   }
 }
 
-void Snake::_placeFood(Food &food) {
+void Snake::_placeFood(Food &food, Food &otherFood) {
   size_t mapSize = _config.width * _config.height;
   std::vector<glm::ivec2> freePlaces;
 
@@ -223,18 +233,23 @@ void Snake::_placeFood(Food &food) {
 
     bool collision = false;
     for (auto bodyPart : _fstPlayer.data.bodyParts)
-      if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit)
+      if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit) {
         collision = true;
+        break;
+      }
     if (collision) continue;
     for (auto bodyPart : _sndPlayer.data.bodyParts)
-      if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit)
+      if (x == bodyPart.x / _snakeUnit && y == bodyPart.y / _snakeUnit) {
         collision = true;
+        break;
+      }
     if (collision) continue;
 	if (_config.obstacles)
 		for (auto obstacle : _obstacles)
 	      if (x == obstacle.x / _snakeUnit && y == obstacle.y / _snakeUnit)
 	        collision = true;
 	if (collision) continue;
+	if (otherFood.coords.x == x && otherFood.coords.y == y) continue;
     freePlaces.push_back(glm::ivec2(x * _snakeUnit, y * _snakeUnit));
   }
 

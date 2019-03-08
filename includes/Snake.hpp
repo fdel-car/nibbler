@@ -22,6 +22,7 @@ struct Keys {
 
 struct Player {
   float speed = 1.f;
+  int boostTimer = 0;
   float distCrawled = 0.f;
   int prevCrawled = 0;
   SharedData data;
@@ -70,6 +71,7 @@ class Snake {
   Player _sndPlayer;
   float _interval;
   int const _snakeUnit;
+  int _diagLength;
   Food _apple;
   Food _meat;
   std::vector<glm::ivec2> _obstacles;
@@ -86,7 +88,7 @@ class Snake {
   void _loadDylib(void);
   void _unloadDylib(void);
   void _foodHandler(Player &player);
-  void _placeFood(Food &food);
+  void _placeFood(Food &food, Food &otherFood);
   void _dropBonusFood(void);
   bool _handlePlayer(Player &player, Player &opponent);
   bool _killPlayer(Player &player);

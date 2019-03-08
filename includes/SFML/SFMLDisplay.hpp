@@ -33,7 +33,8 @@ class SFMLDisplay : public IDisplay {
 
   void _drawSnake(std::vector<glm::ivec2> const &snakeCoords,
                   std::vector<sf::CircleShape> *bodySnake);
-  void _drawFood(glm::ivec2 const &appleCoords, sf::Color const color);
+  void _drawFood(glm::ivec2 const &appleCoords, sf::Color const color,
+                 bool thickness = false);
   void _drawObstacles(std::vector<glm::ivec2> const &obstacles);
   void _displayScore(SharedData const &fstData, SharedData const &sndData);
 

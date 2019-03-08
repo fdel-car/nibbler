@@ -172,9 +172,11 @@ void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
   glfwSwapBuffers(_window);
 }
 
-void GLFWDisplay::_displayScore(SharedData const &fstData, SharedData const &sndData) {
-	std::string score = "Nibbler - GLFW " + fstData.score + (sndData.score.size() ? " | " + sndData.score : "");
-	glfwSetWindowTitle(_window, score.c_str());
+void GLFWDisplay::_displayScore(SharedData const &fstData,
+                                SharedData const &sndData) {
+  std::string score = "Nibbler - GLFW | Score: " + fstData.score +
+                      (sndData.score.size() ? " - " + sndData.score : "");
+  glfwSetWindowTitle(_window, score.c_str());
 }
 
 std::vector<std::string> GLFWDisplay::_keyPressed = std::vector<std::string>();
