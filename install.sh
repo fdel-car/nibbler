@@ -27,13 +27,6 @@ if [[ ! -d "./libs/srcs/glad" && ! -d "./libs/includes/glad" && ! -d "./libs/inc
     rm -rf tmp-glad
 fi
 
-LD_LIBRARY_PATH=`pkg-config --libs-only-L sfml-graphics | cut -c 3-`
-cat ~/.zshrc | grep $LD_LIBRARY_PATH >> /dev/null
-if [ $? == 1 ]; then
-    echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> ~/.zshrc
-    echo -e "${WARNING}You need to source your ~/.zshrc to run nibbler with the SFML.${RESET}"
-fi
-
 which brew >> /dev/null
 if [ $? == 1 ]; then
 	echo -e "${RED}Without brew you can't proceed further.${RESET}"
@@ -43,4 +36,11 @@ else
     pkg-config --cflags glm >> /dev/null || brew install glm
     pkg-config --libs glfw3 >> /dev/null || brew install glfw3
     pkg-config --libs sfml-all >> /dev/null || brew install sfml
+fi
+
+LD_LIBRARY_PATH=`pkg-config --libs-only-L sfml-graphics | cut -c 3-`
+cat ~/.zshrc | grep $LD_LIBRARY_PATH >> /dev/null
+if [ $? == 1 ]; then
+    echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> ~/.zshrc
+    echo -e "${WARNING}You need to source your ~/.zshrc to run nibbler with the SFML.${RESET}"
 fi
