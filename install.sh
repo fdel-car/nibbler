@@ -1,4 +1,7 @@
 #!/bin/bash
+ERROR="\033[1;31m"
+WARNING="\033[1;33m"
+RESET="\033[0m"
 
 which python >> /dev/null || (echo "You need to have python installed first, you can use 'brew install python' for instance." || exit 0)
 # pip install
@@ -7,7 +10,7 @@ if [ $? == 1 ]; then
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python get-pip.py --user
     rm get-pip.py
-	echo -e "\033[1;31mIn order to finish the install script you need to add the path to the pip binary to your PATH env variable.\033[0m"
+	echo -e "${WARNING}In order to finish the install script you need to add the path to the pip binary to your PATH env variable.${RESET}"
     exit 0;
 fi
 
@@ -28,5 +31,16 @@ LD_LIBRARY_PATH=`pkg-config --libs-only-L sfml-graphics | cut -c 3-`
 cat ~/.zshrc | grep $LD_LIBRARY_PATH >> /dev/null
 if [ $? == 1 ]; then
     echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> ~/.zshrc
-    echo -e "\033[1;33mYou need to source your ~/.zshrc to run nibbler with the SFML."
+    echo -e "${WARNING}You need to source your ~/.zshrc to run nibbler with the SFML.${RESET}"
+fi
+
+which brew >> /dev/null
+if [ $? == 1 ]; then
+	echo -e "${RED}Without brew you can't proceed further.${RESET}"
+    exit 1;
+else
+    which pkg-config >> /dev/null || brew install pkg-config
+    pkg-config --cflags glm >> /dev/null || brew install glm
+    pkg-config --libs glfw3 >> /dev/null || brew install glfw3
+    pkg-config --libs sfml-all >> /dev/null || brew install sfml
 fi
