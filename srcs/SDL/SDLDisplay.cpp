@@ -86,6 +86,7 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
                              glm::ivec2 const &meatCoords,
                              SharedData const &fstData,
                              SharedData const &sndData) {
+  _displayScore(fstData, sndData);
   SDL_RenderClear(_renderer);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawFood(appleCoords);
@@ -96,6 +97,13 @@ void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
   if (sndData.bodyParts.size() != 0) _drawSnake(sndData.bodyParts);
   SDL_SetRenderDrawColor(_renderer, 51, 51, 51, 255);
   SDL_RenderPresent(_renderer);
+}
+
+void SDLDisplay::_displayScore(SharedData const &fstData,
+                               SharedData const &sndData) {
+  std::string score = "Nibbler - SDL | Score: " + fstData.score +
+                      (sndData.score.size() ? " - " + sndData.score : "");
+  SDL_SetWindowTitle(_window, score.c_str());
 }
 
 std::map<ushort, std::string> SDLDisplay::_initKeyMap(void) {

@@ -20,6 +20,7 @@ struct KeyState {
 struct SharedData {
   int dirAngle = 180;
   std::vector<glm::ivec2> bodyParts;
+  std::string score;
 };
 
 class IDisplay {

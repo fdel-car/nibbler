@@ -13,6 +13,7 @@ Snake::Snake(Config config)
   int xPos = _config.width / 3;
   int yPos = _config.height / 3;
 
+  _fstPlayer.data.score = "0";
   for (int i = 3; i >= 0; i--) {
     _fstPlayer.data.bodyParts.push_back(
         glm::ivec2(xPos * _snakeUnit, (yPos + i) * _snakeUnit));
@@ -20,6 +21,7 @@ Snake::Snake(Config config)
   }
 
   if (_config.twoPlayers) {
+    _sndPlayer.data.score = "0";
     _sndPlayer.data.dirAngle = 0;
     for (int i = 0; i < 4; i++) {
       _sndPlayer.data.bodyParts.push_back(
@@ -184,6 +186,8 @@ void Snake::_foodHandler(Player &player) {
     player.speed += 0.02f;
     _placeFood(_apple, _meat);
     player.hasEaten = true;
+    player.score++;
+    player.data.score = std::to_string(player.score);
   }
   if (player.data.bodyParts.front() == _meat.coords) {
     player.newBodyPart = player.data.bodyParts.back();
@@ -193,6 +197,8 @@ void Snake::_foodHandler(Player &player) {
     player.speed += 0.04f;
     player.boostTimer += _diagLength >> 1;
     player.hasEaten = true;
+    player.score += 2;
+    player.data.score = std::to_string(player.score);
   }
 }
 
