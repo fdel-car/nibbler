@@ -72,6 +72,7 @@ class Snake {
   int const _snakeUnit;
   Food _apple;
   Food _meat;
+  std::vector<glm::ivec2> _obstacles;
 
   static std::vector<std::string> _dylibsPaths;
 
@@ -89,6 +90,7 @@ class Snake {
   void _dropBonusFood(void);
   bool _handlePlayer(Player &player, Player &opponent);
   bool _killPlayer(Player &player);
+  void _initObstacles(void);
 
   static std::vector<std::string> _initDylibsPaths(void);
 

@@ -82,12 +82,20 @@ void SDLDisplay::_drawFood(glm::ivec2 const &appleCoords) {
   _drawCircle(appleCoords.x, appleCoords.y, __GAME_LENGTH_UNIT__ / 2.f);
 }
 
+void SDLDisplay::_drawObstacles(std::vector<glm::ivec2> const &obstacles) {
+    for (const auto &obstacle : obstacles)
+      _drawCircle(obstacle.x, obstacle.y, __GAME_LENGTH_UNIT__ / 2.f);
+}
+
 void SDLDisplay::renderScene(glm::ivec2 const &appleCoords,
                              glm::ivec2 const &meatCoords,
                              SharedData const &fstData,
-                             SharedData const &sndData) {
+                             SharedData const &sndData,
+						 	 std::vector<glm::ivec2> const &obstacles) {
   _displayScore(fstData, sndData);
   SDL_RenderClear(_renderer);
+  SDL_SetRenderDrawColor(_renderer, 128, 128, 128, 255);
+  _drawObstacles(obstacles);
   SDL_SetRenderDrawColor(_renderer, 255, 0, 0, 255);
   _drawFood(appleCoords);
   SDL_SetRenderDrawColor(_renderer, 255, 255, 0, 255);

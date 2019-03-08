@@ -14,7 +14,8 @@ class GLFWDisplay : public IDisplay {
   bool windowIsOpen(void) const;
   void pollEvent(std::map<std::string, KeyState> &keyMap);
   void renderScene(glm::ivec2 const &appleCoords, glm::ivec2 const &meatCoords,
-                   SharedData const &fstData, SharedData const &sndData);
+                   SharedData const &fstData, SharedData const &sndData,
+			       std::vector<glm::ivec2> const &obstacles);
 
  private:
   int _width, _height;
@@ -24,6 +25,7 @@ class GLFWDisplay : public IDisplay {
   Circle *_food = nullptr;
   std::vector<Circle> _fstBody;
   std::vector<Circle> _sndBody;
+  std::vector<Circle> _obstacles;
 
   static std::vector<std::string> _keyPressed;
   static std::vector<std::string> _keyReleased;
@@ -37,8 +39,8 @@ class GLFWDisplay : public IDisplay {
   void _drawSnake(SharedData const &snakeCoords,
                   std::vector<Circle> &bodySnake);
   void _drawEyes(Circle const &snakeHead, int const dirAngle);
-
   void _drawFood(glm::ivec2 const &appleCoords, glm::vec3 const color);
+  void _drawObstacles(std::vector<glm::ivec2> const &obstacles);
   void _displayScore(SharedData const &fstData, SharedData const &sndData);
 
   static void _keyCallback(GLFWwindow *window, int key, int scancode,

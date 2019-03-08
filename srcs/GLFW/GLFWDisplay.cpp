@@ -100,6 +100,18 @@ void GLFWDisplay::_drawSnake(SharedData const &data,
   _drawEyes(bodySnake.front(), data.dirAngle);
 }
 
+void GLFWDisplay::_drawObstacles(std::vector<glm::ivec2> const &obstacles) {
+  size_t size = _obstacles.size();
+  for (size_t i = 0; i < obstacles.size() - size; i++) {
+    _obstacles.emplace_back(__GAME_LENGTH_UNIT__ / 2.f);
+    _obstacles[i + size].setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+  }
+  for (size_t i = 0; i < obstacles.size(); i++) {
+    _obstacles[i].setPosition(obstacles[i]);
+    _obstacles[i].render(*_shaderProgram);
+  }
+}
+
 void GLFWDisplay::_drawFood(glm::ivec2 const &appleCoords,
                             glm::vec3 const color) {
   _food->setPosition(appleCoords);
@@ -146,11 +158,12 @@ void GLFWDisplay::_drawEyes(Circle const &snakeHead, int const dirAngle) {
 void GLFWDisplay::renderScene(glm::ivec2 const &appleCoords,
                               glm::ivec2 const &meatCoords,
                               SharedData const &fstData,
-                              SharedData const &sndData) {
+                              SharedData const &sndData,
+						  	  std::vector<glm::ivec2> const &obstacles) {
   _displayScore(fstData, sndData);
   glClearColor(0.2f, 0.2f, 0.2f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT);
-
+  _drawObstacles(obstacles);
   _drawFood(appleCoords, glm::vec3(0.8f, 0.f, 0.f));
   _drawFood(meatCoords, glm::vec3(1.f, 1.f, 0.f));
   if (fstData.bodyParts.size() != 0) _drawSnake(fstData, _fstBody);
