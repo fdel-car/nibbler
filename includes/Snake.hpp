@@ -10,6 +10,7 @@ struct Config {
   int width;
   int height;
   bool twoPlayers = false;
+  bool obstacles = false;
 };
 
 struct Keys {
